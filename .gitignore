@@ -1,0 +1,18 @@
+# Build artifacts
+build/
+dist/
+DerivedData/
+
+# Reasonix local tool state
+.reasonix/
+reasonix.toml
+
+# macOS
+.DS_Store
+xcuserdata/
+*.xcuserstate
+
+# Packages
+*.ipa
+*.xcarchive
+*.dSYM.zip

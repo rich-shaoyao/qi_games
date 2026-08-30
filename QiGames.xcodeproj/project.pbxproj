@@ -1,0 +1,443 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		06371819217DE33A004FE349 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 06371818217DE33A004FE349 /* AppDelegate.m */; };
+		06371821217DE33D004FE349 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 06371820217DE33D004FE349 /* Assets.xcassets */; };
+		06371824217DE33D004FE349 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 06371822217DE33D004FE349 /* LaunchScreen.storyboard */; };
+		06371827217DE33D004FE349 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 06371826217DE33D004FE349 /* main.m */; };
+		06DAFBFE21805385007E869D /* QiSpeechManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 06DAFBFD21805385007E869D /* QiSpeechManager.m */; };
+		06DAFC0421809C61007E869D /* QiDraw.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 06DAFC0221809C61007E869D /* QiDraw.storyboard */; };
+		06DAFC0821809CAB007E869D /* QiDrawViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 06DAFC0721809CAB007E869D /* QiDrawViewController.m */; };
+		A1B2C3D4E5F6010100000011 /* QiAdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010100000002 /* QiAdManager.m */; };
+		A1B2C3D4E5F6010100000012 /* QiHiddenAdPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010100000004 /* QiHiddenAdPanel.m */; };
+		C1D2E3F4A5B60101000000A7 /* QiInMobiAdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B60101000000A6 /* QiInMobiAdManager.m */; };
+		C1D2E3F4A5B60101000000A2 /* InMobiSDK in Frameworks */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B60101000000A1 /* InMobiSDK.xcframework */; };
+		C1D2E3F4A5B60101000000A3 /* InMobiSDK in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B60101000000A1 /* InMobiSDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D2E3F4A5B6C70101000000A2 /* VungleAdsSDK in Frameworks */ = {isa = PBXBuildFile; fileRef = D2E3F4A5B6C70101000000A1 /* VungleAdsSDK.xcframework */; };
+		D2E3F4A5B6C70101000000A3 /* VungleAdsSDK in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D2E3F4A5B6C70101000000A1 /* VungleAdsSDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D1E2F3A4B5C6010100000003 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = D1E2F3A4B5C6010100000002 /* GoogleMobileAds */; };
+		E1F2A3B4C5D60101000000A1 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E1F2A3B4C5D60101000000A2 /* PrivacyInfo.xcprivacy */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C1D2E3F4A5B60101000000A4 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C1D2E3F4A5B60101000000A3 /* InMobiSDK in Embed Frameworks */,
+				D2E3F4A5B6C70101000000A3 /* VungleAdsSDK in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		06371814217DE33A004FE349 /* QiGames.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QiGames.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		06371817217DE33A004FE349 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		06371818217DE33A004FE349 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		06371820217DE33D004FE349 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		06371823217DE33D004FE349 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		06371825217DE33D004FE349 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		06371826217DE33D004FE349 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		06DAFBFC21805385007E869D /* QiSpeechManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QiSpeechManager.h; sourceTree = "<group>"; };
+		06DAFBFD21805385007E869D /* QiSpeechManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QiSpeechManager.m; sourceTree = "<group>"; };
+		06DAFC0321809C61007E869D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = QiGames/Base.lproj/QiDraw.storyboard; sourceTree = "<group>"; };
+		06DAFC0621809CAB007E869D /* QiDrawViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QiDrawViewController.h; sourceTree = "<group>"; };
+		06DAFC0721809CAB007E869D /* QiDrawViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QiDrawViewController.m; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010100000001 /* QiAdManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QiAdManager.h; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010100000002 /* QiAdManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QiAdManager.m; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010100000003 /* QiHiddenAdPanel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QiHiddenAdPanel.h; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010100000004 /* QiHiddenAdPanel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QiHiddenAdPanel.m; sourceTree = "<group>"; };
+		C1D2E3F4A5B60101000000A1 /* InMobiSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = InMobiSDK.xcframework; path = "QiGames/Vendor/InMobi/InMobiSDK.xcframework"; sourceTree = "<group>"; };
+		C1D2E3F4A5B60101000000A5 /* QiInMobiAdManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QiInMobiAdManager.h; sourceTree = "<group>"; };
+		C1D2E3F4A5B60101000000A6 /* QiInMobiAdManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QiInMobiAdManager.m; sourceTree = "<group>"; };
+		D2E3F4A5B6C70101000000A1 /* VungleAdsSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = VungleAdsSDK.xcframework; path = "QiGames/Vendor/Vungle/VungleAdsSDK.xcframework"; sourceTree = "<group>"; };
+		E1F2A3B4C5D60101000000A2 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		06371811217DE33A004FE349 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C1D2E3F4A5B60101000000A2 /* InMobiSDK in Frameworks */,
+				D2E3F4A5B6C70101000000A2 /* VungleAdsSDK in Frameworks */,
+				D1E2F3A4B5C6010100000003 /* GoogleMobileAds in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0637180B217DE33A004FE349 = {
+			isa = PBXGroup;
+			children = (
+				06DAFC0221809C61007E869D /* QiDraw.storyboard */,
+				06371816217DE33A004FE349 /* QiGames */,
+				06371815217DE33A004FE349 /* Products */,
+				DE892D891764AA0469501DCA /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		06371815217DE33A004FE349 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				06371814217DE33A004FE349 /* QiGames.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		06371816217DE33A004FE349 /* QiGames */ = {
+			isa = PBXGroup;
+			children = (
+				06371817217DE33A004FE349 /* AppDelegate.h */,
+				06371818217DE33A004FE349 /* AppDelegate.m */,
+				A1B2C3D4E5F6010100000001 /* QiAdManager.h */,
+				A1B2C3D4E5F6010100000002 /* QiAdManager.m */,
+				A1B2C3D4E5F6010100000003 /* QiHiddenAdPanel.h */,
+				A1B2C3D4E5F6010100000004 /* QiHiddenAdPanel.m */,
+				C1D2E3F4A5B60101000000A5 /* QiInMobiAdManager.h */,
+				C1D2E3F4A5B60101000000A6 /* QiInMobiAdManager.m */,
+				06DAFBFC21805385007E869D /* QiSpeechManager.h */,
+				06DAFBFD21805385007E869D /* QiSpeechManager.m */,
+				06DAFC0521809C92007E869D /* QiDraw */,
+				06371820217DE33D004FE349 /* Assets.xcassets */,
+				06371822217DE33D004FE349 /* LaunchScreen.storyboard */,
+				06371825217DE33D004FE349 /* Info.plist */,
+				E1F2A3B4C5D60101000000A2 /* PrivacyInfo.xcprivacy */,
+				06371826217DE33D004FE349 /* main.m */,
+			);
+			path = QiGames;
+			sourceTree = "<group>";
+		};
+		06DAFC0521809C92007E869D /* QiDraw */ = {
+			isa = PBXGroup;
+			children = (
+				06DAFC0621809CAB007E869D /* QiDrawViewController.h */,
+				06DAFC0721809CAB007E869D /* QiDrawViewController.m */,
+			);
+			path = QiDraw;
+			sourceTree = "<group>";
+		};
+		DE892D891764AA0469501DCA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C1D2E3F4A5B60101000000A1 /* InMobiSDK.xcframework */,
+				D2E3F4A5B6C70101000000A1 /* VungleAdsSDK.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		06371813217DE33A004FE349 /* QiGames */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0637182A217DE33D004FE349 /* Build configuration list for PBXNativeTarget "QiGames" */;
+			buildPhases = (
+				06371810217DE33A004FE349 /* Sources */,
+				06371811217DE33A004FE349 /* Frameworks */,
+				06371812217DE33A004FE349 /* Resources */,
+				C1D2E3F4A5B60101000000A4 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = QiGames;
+			packageProductDependencies = (
+				D1E2F3A4B5C6010100000002 /* GoogleMobileAds */,
+			);
+			productName = QiGames;
+			productReference = 06371814217DE33A004FE349 /* QiGames.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0637180C217DE33A004FE349 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1000;
+				ORGANIZATIONNAME = 360.cn;
+				TargetAttributes = {
+					06371813217DE33A004FE349 = {
+						CreatedOnToolsVersion = 10.0;
+					};
+				};
+			};
+			buildConfigurationList = 0637180F217DE33A004FE349 /* Build configuration list for PBXProject "QiGames" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 0637180B217DE33A004FE349;
+			packageReferences = (
+				D1E2F3A4B5C6010100000001 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+			);
+			productRefGroup = 06371815217DE33A004FE349 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				06371813217DE33A004FE349 /* QiGames */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		06371812217DE33A004FE349 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				06371824217DE33D004FE349 /* LaunchScreen.storyboard in Resources */,
+				06371821217DE33D004FE349 /* Assets.xcassets in Resources */,
+				06DAFC0421809C61007E869D /* QiDraw.storyboard in Resources */,
+				E1F2A3B4C5D60101000000A1 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		06371810217DE33A004FE349 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				06DAFC0821809CAB007E869D /* QiDrawViewController.m in Sources */,
+				06371827217DE33D004FE349 /* main.m in Sources */,
+				06DAFBFE21805385007E869D /* QiSpeechManager.m in Sources */,
+				06371819217DE33A004FE349 /* AppDelegate.m in Sources */,
+				A1B2C3D4E5F6010100000011 /* QiAdManager.m in Sources */,
+				A1B2C3D4E5F6010100000012 /* QiHiddenAdPanel.m in Sources */,
+				C1D2E3F4A5B60101000000A7 /* QiInMobiAdManager.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		06371822217DE33D004FE349 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				06371823217DE33D004FE349 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		06DAFC0221809C61007E869D /* QiDraw.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				06DAFC0321809C61007E869D /* Base */,
+			);
+			name = QiDraw.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		06371828217DE33D004FE349 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		06371829217DE33D004FE349 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		0637182B217DE33D004FE349 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = QiGames/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.qishare.ios.hxs;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 x86_64";
+			};
+			name = Debug;
+		};
+		0637182C217DE33D004FE349 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = QiGames/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.qishare.ios.hxs;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 x86_64";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0637180F217DE33A004FE349 /* Build configuration list for PBXProject "QiGames" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				06371828217DE33D004FE349 /* Debug */,
+				06371829217DE33D004FE349 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0637182A217DE33D004FE349 /* Build configuration list for PBXNativeTarget "QiGames" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0637182B217DE33D004FE349 /* Debug */,
+				0637182C217DE33D004FE349 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D1E2F3A4B5C6010100000001 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads";
+			requirement = {
+				kind = exactVersion;
+				version = 11.7.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D1E2F3A4B5C6010100000002 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D1E2F3A4B5C6010100000001 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 0637180C217DE33A004FE349 /* Project object */;
+}
