@@ -7,11 +7,13 @@
 #   1) 未提供签名 secrets -> 未签名 ipa（CODE_SIGNING_ALLOWED=NO），可下载后用 Sideloadly 自签安装
 #   2) 提供签名 secrets    -> App Store 签名 ipa，可再配合上传 workflow 提交 App Store Connect
 #
-# 触发：GitHub 页面 Actions -> 本 workflow -> Run workflow（手动）
+# 触发：推送 main 分支自动打包；也可在 Actions 页面手动 Run workflow
 name: CI Package (pre-release verification)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   package:
