@@ -3,11 +3,12 @@
 # 用途：在 GitHub 云环境（自带新版 Xcode，可链接 AdMob 11.7.0）构建 Release 包并产出 ipa，
 #       下载回本地安装/测试；上架前验证构建链路，无需本机升级 Xcode。
 #
-# 两种模式（自动判断）：
+# 两种模式（自动判断，依据是否配置签名 secrets）：
 #   1) 未提供签名 secrets -> 未签名 ipa（CODE_SIGNING_ALLOWED=NO），可下载后用 Sideloadly 自签安装
-#   2) 提供签名 secrets    -> App Store 签名 ipa，可再配合上传 workflow 提交 App Store Connect
+#   2) 提供签名 secrets    -> App Store 签名 ipa，可再配合上传流程提交 App Store Connect
 #
-# 触发：推送 main 分支自动打包；也可在 Actions 页面手动 Run workflow
+# 注意：GitHub Actions 的 if: 条件不能直接引用 secrets，因此签名判断用 job 级 env 标志实现。
+# 触发：推送 main 自动打包；也可在 Actions 页面手动 Run workflow
 name: CI Package (pre-release verification)
 
 on:
@@ -18,18 +19,20 @@ on:
 jobs:
   package:
     runs-on: macos-latest
+    env:
+      HAS_CERT: ${{ secrets.DIST_CERT_P12 != '' }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Import distribution certificate
-        if: ${{ secrets.DIST_CERT_P12 != '' }}
+        if: env.HAS_CERT == 'true'
         uses: apple-actions/import-codesign-certs@v3
         with:
           p12-file-base64: ${{ secrets.DIST_CERT_P12 }}
           p12-password: ${{ secrets.DIST_CERT_PASSWORD }}
 
       - name: Install provisioning profile
-        if: ${{ secrets.PROVISIONING_PROFILE != '' }}
+        if: env.HAS_CERT == 'true'
         run: |
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
           echo "${{ secrets.PROVISIONING_PROFILE }}" | base64 -d > "$HOME/Library/MobileDevice/Provisioning Profiles/QiGames.mobileprovision"
@@ -39,28 +42,30 @@ jobs:
           xcodebuild -version
           sw_vers
 
-      - name: Archive (unsigned)
-        if: ${{ secrets.DIST_CERT_P12 == '' }}
+      - name: Archive (unsigned by default; signed when cert secrets configured)
+        env:
+          CERT_P12: ${{ secrets.DIST_CERT_P12 }}
+          TEAM_ID: ${{ secrets.DEVELOPER_TEAM_ID }}
+          PROFILE_SPECIFIER: ${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}
         run: |
-          xcodebuild archive \
-            -project QiGames.xcodeproj -scheme QiGames \
-            -configuration Release \
-            -destination 'generic/platform=iOS' \
-            -archivePath build/QiGames.xcarchive \
-            CODE_SIGNING_ALLOWED=NO
-
-      - name: Archive (signed, App Store)
-        if: ${{ secrets.DIST_CERT_P12 != '' }}
-        run: |
-          xcodebuild archive \
-            -project QiGames.xcodeproj -scheme QiGames \
-            -configuration Release \
-            -destination 'generic/platform=iOS' \
-            -archivePath build/QiGames.xcarchive \
-            DEVELOPMENT_TEAM=${{ secrets.DEVELOPER_TEAM_ID }} \
-            CODE_SIGN_STYLE=Manual \
-            PROVISIONING_PROFILE_SPECIFIER=${{ secrets.PROVISIONING_PROFILE_SPECIFIER }} \
-            -allowProvisioningUpdates
+          if [ -n "$CERT_P12" ]; then
+            xcodebuild archive \
+              -project QiGames.xcodeproj -scheme QiGames \
+              -configuration Release \
+              -destination 'generic/platform=iOS' \
+              -archivePath build/QiGames.xcarchive \
+              DEVELOPMENT_TEAM="$TEAM_ID" \
+              CODE_SIGN_STYLE=Manual \
+              PROVISIONING_PROFILE_SPECIFIER="$PROFILE_SPECIFIER" \
+              -allowProvisioningUpdates
+          else
+            xcodebuild archive \
+              -project QiGames.xcodeproj -scheme QiGames \
+              -configuration Release \
+              -destination 'generic/platform=iOS' \
+              -archivePath build/QiGames.xcarchive \
+              CODE_SIGNING_ALLOWED=NO
+          fi
 
       - name: Package ipa
         run: |
