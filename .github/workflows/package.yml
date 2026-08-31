@@ -1,7 +1,8 @@
 # 上架前 CI 打包验证
 #
-# 用途：在 GitHub 云环境（自带新版 Xcode，可链接 AdMob 11.7.0）构建 Release 包并产出 ipa，
+# 用途：在 GitHub 云环境（自带新版 Xcode，可链接 AdMob 11.7.0）构建 Release/Debug 包并产出 ipa，
 #       下载回本地安装/测试；上架前验证构建链路，无需本机升级 Xcode。
+#       Debug 包用于真机验证隐藏广告面板（5 连点触发，见 QiDrawViewController.m）。
 #
 # 两种模式（自动判断，依据是否配置签名 secrets）：
 #   1) 未提供签名 secrets -> 未签名 ipa（CODE_SIGNING_ALLOWED=NO），可下载后用 Sideloadly 自签安装
@@ -13,6 +14,15 @@ name: CI Package (pre-release verification)
 
 on:
   workflow_dispatch:
+    inputs:
+      configuration:
+        description: '构建配置：Release 或 Debug（真机验证广告面板用 Debug）'
+        required: false
+        default: 'Release'
+        type: choice
+        options:
+          - Release
+          - Debug
   push:
     branches: [ main ]
 
@@ -21,6 +31,7 @@ jobs:
     runs-on: macos-latest
     env:
       HAS_CERT: ${{ secrets.DIST_CERT_P12 != '' }}
+      CONFIGURATION: ${{ github.event.inputs.configuration || 'Release' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -51,7 +62,7 @@ jobs:
           if [ -n "$CERT_P12" ]; then
             xcodebuild archive \
               -project QiGames.xcodeproj -scheme QiGames \
-              -configuration Release \
+              -configuration $CONFIGURATION \
               -destination 'generic/platform=iOS' \
               -archivePath build/QiGames.xcarchive \
               DEVELOPMENT_TEAM="$TEAM_ID" \
@@ -61,7 +72,7 @@ jobs:
           else
             xcodebuild archive \
               -project QiGames.xcodeproj -scheme QiGames \
-              -configuration Release \
+              -configuration $CONFIGURATION \
               -destination 'generic/platform=iOS' \
               -archivePath build/QiGames.xcarchive \
               CODE_SIGNING_ALLOWED=NO
