@@ -17,6 +17,7 @@
 		A1B2C3D4E5F6010100000011 /* QiAdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010100000002 /* QiAdManager.m */; };
 		A1B2C3D4E5F6010100000012 /* QiHiddenAdPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010100000004 /* QiHiddenAdPanel.m */; };
 		A96D93BCA6875081847362EA /* Pods_QiGames.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF83A83D10E1948F3A6C6A19 /* Pods_QiGames.framework */; };
+		A1B2C3D4E5F60101000000A6 /* SwiftLinkSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60101000000A5 /* SwiftLinkSupport.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 		0FBEB3D34C1DBDFFBFB94C9D /* Pods-QiGames.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QiGames.debug.xcconfig"; path = "Target Support Files/Pods-QiGames/Pods-QiGames.debug.xcconfig"; sourceTree = "<group>"; };
 		AF83A83D10E1948F3A6C6A19 /* Pods_QiGames.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_QiGames.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D57597EFC11046F88AD60933 /* Pods-QiGames.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QiGames.release.xcconfig"; path = "Target Support Files/Pods-QiGames/Pods-QiGames.release.xcconfig"; sourceTree = "<group>"; };
+		A1B2C3D4E5F60101000000A5 /* SwiftLinkSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLinkSupport.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +100,7 @@
 				06371822217DE33D004FE349 /* LaunchScreen.storyboard */,
 				06371825217DE33D004FE349 /* Info.plist */,
 				06371826217DE33D004FE349 /* main.m */,
+				A1B2C3D4E5F60101000000A5 /* SwiftLinkSupport.swift */,
 			);
 			path = QiGames;
 			sourceTree = "<group>";
@@ -257,6 +260,7 @@
 				06371819217DE33A004FE349 /* AppDelegate.m in Sources */,
 				A1B2C3D4E5F6010100000011 /* QiAdManager.m in Sources */,
 				A1B2C3D4E5F6010100000012 /* QiHiddenAdPanel.m in Sources */,
+				A1B2C3D4E5F60101000000A6 /* SwiftLinkSupport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -408,6 +412,7 @@
 					"@executable_path/Frameworks",
 				);
 				OTHER_LDFLAGS = "$(inherited) -ObjC";
+				SWIFT_VERSION = 5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.qishare.ios.hxs;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -429,6 +434,7 @@
 					"@executable_path/Frameworks",
 				);
 				OTHER_LDFLAGS = "$(inherited) -ObjC";
+				SWIFT_VERSION = 5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.qishare.ios.hxs;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
