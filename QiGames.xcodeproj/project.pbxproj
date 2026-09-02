@@ -413,7 +413,7 @@
 				);
 				OTHER_LDFLAGS = "$(inherited) -ObjC";
 				SWIFT_VERSION = 5.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.qishare.ios.hxs;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yianzhixin.ios.word;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 x86_64";
@@ -435,7 +435,7 @@
 				);
 				OTHER_LDFLAGS = "$(inherited) -ObjC";
 				SWIFT_VERSION = 5.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.qishare.ios.hxs;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yianzhixin.ios.word;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 x86_64";

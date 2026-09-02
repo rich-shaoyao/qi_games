@@ -13,7 +13,7 @@
 | 支持架构 | arm64（真机）；x86_64（Intel Mac 模拟器，`VALID_ARCHS = "arm64 x86_64"`） |
 | 界面方式 | Storyboard（`QiDraw.storyboard` + `LaunchScreen.storyboard`） |
 | 依赖管理 | CocoaPods：`Google-Mobile-Ads-SDK`（= 11.7.0 精确锁定）、`FBAudienceNetwork`、`VungleSDK-iOS`、`ChartboostSDK`、`InMobiSDK`、`UnityAds`；各依赖（含传递依赖）版本以 `Podfile.lock` 锁定，`Pods/` 不入库 |
-| Bundle ID | `com.qishare.ios.hxs` |
+| Bundle ID | `com.yianzhixin.ios.word` |
 | 版本号 | `CFBundleShortVersionString` = 1.0，`CFBundleVersion` = 1 |
 | 广告模块 | `QiAdManager`（AdMob 真实实现：激励视频 / 插屏加载 / 播放 / 播完自动重拉）+ `QiHiddenAdPanel` 隐藏广告面板（Rewarded / Interstitial 两栏，每栏 AdMob / Meta / Vungle / Chartboost / InMobi / Unity Ads 六平台行；当前仅 AdMob 真接入，其余五平台为占位「未接入」） |
 | 广告位 ID | 当前使用 AdMob 官方测试 ID（App ID + 激励 + 插屏），正式 ID 到手后替换 `QiAdManager.m` 顶部常量与 `Info.plist` 的 `GADApplicationIdentifier` |
