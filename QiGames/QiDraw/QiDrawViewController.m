@@ -102,29 +102,8 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
         _hiddenTriggerTextField.text = kQiHiddenPanelTriggerText;
     }
     
-    // Real-device verification: tapping the app icon cannot pass launch
-    // arguments, so 5 quick taps anywhere trigger the panel immediately.
-    UITapGestureRecognizer *simulateTriggerTap =
-        [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                action:@selector(qi_handleSimulateTriggerTap:)];
-    simulateTriggerTap.numberOfTapsRequired = 5;
-    simulateTriggerTap.numberOfTouchesRequired = 1;
-    [self.view addGestureRecognizer:simulateTriggerTap];
+    // Real-device verification no longer uses tap gestures (removed).
 #endif
-}
-
-/**
- *  Debug-only: after 5 quick taps, assigns the trigger text and shows the
- *  hidden ad panel right away (bypasses the one-shot 5-10s check, which may
- *  have already run by the time the user finishes tapping).
- *
- *  @param gesture The tap gesture recognizer.
- *  @return None.
- */
-- (void)qi_handleSimulateTriggerTap:(UITapGestureRecognizer *)gesture {
-    
-    _hiddenTriggerTextField.text = kQiHiddenPanelTriggerText;
-    [QiHiddenAdPanel show];
 }
 
 /**
