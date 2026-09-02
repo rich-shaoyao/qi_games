@@ -11,6 +11,7 @@
 #import <InMobiSDK/InMobiSDK-Swift.h>
 #import <UserMessagingPlatform/UserMessagingPlatform.h>
 #import <VungleAdsSDK/VungleAdsSDK.h>
+#import <ChartboostSDK/Chartboost.h>
 
 // FIX-04: InMobi account ID. TODO: replace the placeholder with the real InMobi
 // account ID from https://publisher.inmobi.com before delivery. The SDK only
@@ -21,6 +22,14 @@ static NSString * const kQiInMobiAccountID = @"REPLACE_WITH_INMOBI_ACCOUNT_ID";
 // Vungle app ID from the Liftoff dashboard before delivery. The SDK only serves
 // ads once a valid app ID is configured (placement IDs live in QiAdManager.m).
 static NSString * const kQiVungleAppID = @"REPLACE_WITH_VUNGLE_APP_ID";
+
+// FIX-04: Chartboost app ID / signature. Currently using the official Chartboost
+// demo app credentials (from the ios-sdk-example-9.11.0 sample project) so that
+// test ads actually load. TODO: replace with the production app ID / signature
+// from the Chartboost dashboard before delivery. Locations live in
+// QiChartboostAdManager.m; ChartboostSDK 9.14.0 links with Xcode 26 toolchain.
+static NSString * const kQiChartboostAppID        = @"4f21c409cd1cb2fb7000001b";
+static NSString * const kQiChartboostAppSignature = @"92e2de2fd7070327bdeb54c15a5295309c6fcd2d";
 
 @interface AppDelegate ()
 
@@ -60,6 +69,24 @@ static NSString * const kQiVungleAppID = @"REPLACE_WITH_VUNGLE_APP_ID";
 #if DEBUG
         else {
             NSLog(@"[AppDelegate] Vungle SDK init complete");
+        }
+#endif
+    }];
+    
+    // FIX-04: Start the Chartboost SDK with the demo app credentials
+    // (kQiChartboostAppID / kQiChartboostAppSignature above). Must be called
+    // before any Chartboost ad is cached; data use consent may be set
+    // beforehand in a production integration. Ad caching happens on demand
+    // through QiChartboostAdManager (driven by QiHiddenAdPanel / QiAdManager).
+#if DEBUG
+    [Chartboost setLoggingLevel:CBLoggingLevelInfo];
+#endif
+    [Chartboost startWithAppID:kQiChartboostAppID appSignature:kQiChartboostAppSignature completion:^(CHBStartError *_Nullable error) {
+#if DEBUG
+        if (error) {
+            NSLog(@"[AppDelegate] Chartboost SDK start failed: %@", error);
+        } else {
+            NSLog(@"[AppDelegate] Chartboost SDK started, version %@", [Chartboost getSDKVersion]);
         }
 #endif
     }];

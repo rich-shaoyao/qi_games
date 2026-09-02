@@ -90,6 +90,19 @@ static const int64_t kQiInMobiInterstitialPlacementID = 0; //!< TODO: interstiti
     }
 }
 
+/**
+ *  Returns whether the given InMobi ad type is loaded and ready to play
+ *  (isReady pre-check; does not trigger a load).
+ *
+ *  @param type Ad type (QiInMobiAdTypeRewarded / QiInMobiAdTypeInterstitial).
+ *  @return YES if the ad is ready to play; NO otherwise.
+ */
+- (BOOL)isAdReadyOfType:(QiInMobiAdType)type {
+    
+    IMInterstitial *ad = (type == QiInMobiAdTypeRewarded) ? self.rewardedInterstitial : self.interstitialInterstitial;
+    return ad != nil && ad.isReady;
+}
+
 #pragma mark - InMobi load
 
 /**

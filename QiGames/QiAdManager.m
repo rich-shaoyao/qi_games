@@ -15,6 +15,7 @@
 
 #import "QiAdManager.h"
 #import "QiInMobiAdManager.h"
+#import "QiChartboostAdManager.h"
 #import <GoogleMobileAds/GoogleMobileAds.h>
 #import <VungleAdsSDK/VungleAdsSDK.h>
 
@@ -102,6 +103,11 @@ static NSString * const kQiVungleInterstitialPlacementID = @"REPLACE_WITH_VUNGLE
         [[QiInMobiAdManager sharedManager] loadAdOfType:inMobiType completion:completion];
         return;
     }
+    if (platform == QiAdPlatformChartboost) {
+        QiChartboostAdType chartboostType = (type == QiAdTypeRewarded) ? QiChartboostAdTypeRewarded : QiChartboostAdTypeInterstitial;
+        [[QiChartboostAdManager sharedManager] loadAdOfType:chartboostType completion:completion];
+        return;
+    }
     if (type == QiAdTypeRewarded) {
         [self loadRewardedAdWithCompletion:completion];
     } else {
@@ -169,6 +175,11 @@ static NSString * const kQiVungleInterstitialPlacementID = @"REPLACE_WITH_VUNGLE
         [[QiInMobiAdManager sharedManager] showAdOfType:inMobiType completion:completion];
         return;
     }
+    if (platform == QiAdPlatformChartboost) {
+        QiChartboostAdType chartboostType = (type == QiAdTypeRewarded) ? QiChartboostAdTypeRewarded : QiChartboostAdTypeInterstitial;
+        [[QiChartboostAdManager sharedManager] showAdOfType:chartboostType completion:completion];
+        return;
+    }
     
     if (type == QiAdTypeRewarded) {
         GADRewardedAd *ad = self.rewardedAd;
@@ -201,6 +212,36 @@ static NSString * const kQiVungleInterstitialPlacementID = @"REPLACE_WITH_VUNGLE
 }
 
 #pragma mark - Vungle load
+
+/**
+ *  Returns whether the given ad type is loaded and ready to play on the given
+ *  platform (does not trigger a load).
+ *
+ *  @param type     Ad type (QiAdTypeRewarded / QiAdTypeInterstitial).
+ *  @param platform Ad network platform.
+ *  @return YES if the ad is ready to play; NO otherwise.
+ */
+- (BOOL)isAdReadyOfType:(QiAdType)type platform:(QiAdPlatform)platform {
+    
+    if (platform == QiAdPlatformVungle) {
+        if (type == QiAdTypeRewarded) {
+            return self.vungleRewarded != nil && [self.vungleRewarded canPlayAd];
+        }
+        return self.vungleInterstitial != nil && [self.vungleInterstitial canPlayAd];
+    }
+    if (platform == QiAdPlatformInMobi) {
+        QiInMobiAdType inMobiType = (type == QiAdTypeRewarded) ? QiInMobiAdTypeRewarded : QiInMobiAdTypeInterstitial;
+        return [[QiInMobiAdManager sharedManager] isAdReadyOfType:inMobiType];
+    }
+    if (platform == QiAdPlatformChartboost) {
+        QiChartboostAdType chartboostType = (type == QiAdTypeRewarded) ? QiChartboostAdTypeRewarded : QiChartboostAdTypeInterstitial;
+        return [[QiChartboostAdManager sharedManager] isAdReadyOfType:chartboostType];
+    }
+    if (type == QiAdTypeRewarded) {
+        return self.rewardedAd != nil;
+    }
+    return self.interstitialAd != nil;
+}
 
 /**
  *  Loads the Vungle rewarded ad (VungleRewarded). Returns NO immediately if

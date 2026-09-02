@@ -62,6 +62,14 @@ typedef void (^QiInMobiAdLoadCompletion)(BOOL success);
  */
 - (void)showAdOfType:(QiInMobiAdType)type completion:(QiInMobiAdLoadCompletion)completion;
 
+/**
+ *  Returns whether the given InMobi ad type is loaded and ready to play.
+ *
+ *  @param type Ad type (QiInMobiAdTypeRewarded / QiInMobiAdTypeInterstitial).
+ *  @return YES if the ad is ready to play; NO otherwise.
+ */
+- (BOOL)isAdReadyOfType:(QiInMobiAdType)type;
+
 @end
 
 NS_ASSUME_NONNULL_END

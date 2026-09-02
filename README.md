@@ -15,7 +15,7 @@
 | 依赖管理 | Swift Package Manager（SPM）：AdMob `GoogleMobileAds` v11.7.0（交付目标版本，已锁定；本机 Xcode 15.2 可编译，完整链接需 Xcode 16 / iOS 18 SDK）+ 依赖 `GoogleUserMessagingPlatform` v2.7.0，版本锁定于 `Package.resolved` |
 | Bundle ID | `com.qishare.ios.hxs` |
 | 版本号 | `CFBundleShortVersionString` = 1.0，`CFBundleVersion` = 1 |
-| 广告模块 | `QiAdManager` 抽象层（已接入 AdMob v11.7.0 真实 SDK，激励视频 / 插屏；当前使用 Google 官方测试广告位 ID，正式 ID 替换位置见 `QiAdManager.m`） |
+| 广告模块 | `QiAdManager` 抽象层 + 平台管理器（AdMob v11.7.0 真实 SDK、Vungle 7.0.0、InMobi 11.4.0、Chartboost 9.14.0，激励视频 / 插屏；当前使用各平台测试 ID，正式 ID 替换位置见各 Manager 实现文件顶部常量与 `AppDelegate.m`） |
 | 隐藏功能 | `QiHiddenAdPanel` 隐藏广告面板（宏开关 `HIDDEN_AD_PANEL_ENABLED` 控制，见「开发说明」） |
 
 ## 目录结构
@@ -124,7 +124,7 @@ QiGames/
 
 | 项目 | 要求 |
 | --- | --- |
-| Xcode | 本机 Intel Mac + Xcode 15.2：AdMob 锁定 **11.7.0**，可编译 + 模拟器运行（链接需 16.0 及以上）；**11.7.0 完整链接需 Xcode 16 / iOS 18 SDK**（其二进制链接依赖 `MarketplaceKit` / `CoreAudioTypes` / `swiftXPC`，Xcode 15.x 的 iOS 17.x SDK 无法链接；工程源码本身 Xcode 15.2 可编译） |
+| Xcode | 本机 Intel Mac + Xcode 15.2：AdMob 锁定 **11.3.0**（本机可链接）/ 交付 **11.7.0**（可编译 + 模拟器运行，完整链接需 16.0 及以上）；**Chartboost 9.14.0 完整链接需 Xcode 26（iOS 26 SDK）**——其二进制由 Xcode 26 / Swift 6.2 构建，链接依赖 `swiftSynchronization` / `swiftXPC` 等 Swift 6.2 back-deployment 库，Xcode 16 及以下无法链接（工程源码本身 Xcode 15.2 可编译，链接阶段报 Undefined symbols 属工具链限制非代码问题）；交付打包建议 GitHub Actions 云打包选用 Xcode 26 runner |
 | macOS | 支持 Xcode 16 的 macOS 版本（Apple Silicon）；Intel Mac 最高可用 Xcode 15.x，仅能完成编译无法完成 AdMob 链接 |
 | 最低部署目标 | iOS 15.0（`IPHONEOS_DEPLOYMENT_TARGET`） |
 | 架构 | arm64（真机）；Intel Mac 模拟器自动构建 x86_64（工程 `VALID_ARCHS = "arm64 x86_64"`） |

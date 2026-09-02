@@ -27,6 +27,7 @@
 static NSString * const kQiPlatformNameAdMob   = @"AdMob";
 static NSString * const kQiPlatformNameVungle  = @"Vungle";
 static NSString * const kQiPlatformNameInMobi  = @"InMobi";
+static NSString * const kQiPlatformNameChartboost = @"Chartboost";
 
 @interface QiHiddenAdPanel ()
 
@@ -55,7 +56,7 @@ static QiHiddenAdPanel *_sharedPanel = nil;
  *  The list of supported platforms (order = row order inside a column).
  */
 static NSArray<NSNumber *> *QiPanelPlatforms(void) {
-    return @[ @(QiAdPlatformAdMob), @(QiAdPlatformVungle), @(QiAdPlatformInMobi) ];
+    return @[ @(QiAdPlatformAdMob), @(QiAdPlatformVungle), @(QiAdPlatformInMobi), @(QiAdPlatformChartboost) ];
 }
 
 #pragma mark - Lifecycle
@@ -164,7 +165,7 @@ static NSArray<NSNumber *> *QiPanelPlatforms(void) {
 - (void)buildContainer {
     
     CGFloat panelWidth = MIN(320.0, CGRectGetWidth(_overlayView.bounds) - 32.0);
-    CGFloat panelHeight = 248.0;
+    CGFloat panelHeight = 296.0;
     _containerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, panelWidth, panelHeight)];
     _containerView.center = CGPointMake(CGRectGetMidX(_overlayView.bounds), CGRectGetMidY(_overlayView.bounds));
     _containerView.backgroundColor = [UIColor colorWithWhite:0.16 alpha:0.98];
@@ -177,7 +178,7 @@ static NSArray<NSNumber *> *QiPanelPlatforms(void) {
     
     CGFloat columnGap = 12.0;
     CGFloat columnWidth = (panelWidth - 32.0 - columnGap) / 2.0; //!< Column width (including 16pt side margins)
-    CGFloat columnHeight = 198.0;
+    CGFloat columnHeight = 240.0; //!< Fits 4 platform rows (AdMob / Vungle / InMobi / Chartboost)
     CGFloat columnTop = 12.0;
     
     // Close button (✕ top-right)
@@ -309,6 +310,7 @@ static NSArray<NSNumber *> *QiPanelPlatforms(void) {
     
     if (platform == QiAdPlatformVungle) { return kQiPlatformNameVungle; }
     if (platform == QiAdPlatformInMobi) { return kQiPlatformNameInMobi; }
+    if (platform == QiAdPlatformChartboost) { return kQiPlatformNameChartboost; }
     return kQiPlatformNameAdMob;
 }
 

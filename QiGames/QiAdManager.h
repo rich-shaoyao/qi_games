@@ -29,6 +29,7 @@ typedef NS_ENUM(NSUInteger, QiAdPlatform) {
     QiAdPlatformAdMob,  //!< AdMob (GoogleMobileAds, integrated via SPM)
     QiAdPlatformVungle, //!< Vungle / Liftoff (VungleAds 7.0.0, manual xcframework)
     QiAdPlatformInMobi, //!< InMobi (InMobiSDK 11.4.0, manual xcframework)
+    QiAdPlatformChartboost, //!< Chartboost (ChartboostSDK 9.14.0, manual xcframework; links with Xcode 26 toolchain)
 };
 
 /**
@@ -90,6 +91,16 @@ typedef void (^QiAdLoadCompletion)(BOOL success);
  *  @return None.
  */
 - (void)showAdOfType:(QiAdType)type platform:(QiAdPlatform)platform completion:(QiAdLoadCompletion)completion;
+
+/**
+ *  Returns whether the given ad type is loaded and ready to play on the given
+ *  platform (canPlayAd / isReady pre-check; does not trigger a load).
+ *
+ *  @param type     Ad type (QiAdTypeRewarded / QiAdTypeInterstitial).
+ *  @param platform Ad network platform (QiAdPlatformAdMob / QiAdPlatformVungle / QiAdPlatformInMobi).
+ *  @return YES if the ad is ready to play; NO otherwise.
+ */
+- (BOOL)isAdReadyOfType:(QiAdType)type platform:(QiAdPlatform)platform;
 
 @end
 
