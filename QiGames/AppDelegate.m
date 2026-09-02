@@ -5,31 +5,9 @@
 
 #import "AppDelegate.h"
 #import "QiDrawViewController.h"
-#import "QiAdManager.h"
 #import <AppTrackingTransparency/AppTrackingTransparency.h>
 #import <GoogleMobileAds/GoogleMobileAds.h>
-#import <InMobiSDK/InMobiSDK-Swift.h>
 #import <UserMessagingPlatform/UserMessagingPlatform.h>
-#import <VungleAdsSDK/VungleAdsSDK.h>
-#import <ChartboostSDK/Chartboost.h>
-
-// FIX-04: InMobi account ID. TODO: replace the placeholder with the real InMobi
-// account ID from https://publisher.inmobi.com before delivery. The SDK only
-// serves ads once a valid account ID is configured.
-static NSString * const kQiInMobiAccountID = @"REPLACE_WITH_INMOBI_ACCOUNT_ID";
-
-// FIX-04: Vungle / Liftoff app ID. TODO: replace the placeholder with the real
-// Vungle app ID from the Liftoff dashboard before delivery. The SDK only serves
-// ads once a valid app ID is configured (placement IDs live in QiAdManager.m).
-static NSString * const kQiVungleAppID = @"REPLACE_WITH_VUNGLE_APP_ID";
-
-// FIX-04: Chartboost app ID / signature. Currently using the official Chartboost
-// demo app credentials (from the ios-sdk-example-9.11.0 sample project) so that
-// test ads actually load. TODO: replace with the production app ID / signature
-// from the Chartboost dashboard before delivery. Locations live in
-// QiChartboostAdManager.m; ChartboostSDK 9.14.0 links with Xcode 26 toolchain.
-static NSString * const kQiChartboostAppID        = @"4f21c409cd1cb2fb7000001b";
-static NSString * const kQiChartboostAppSignature = @"92e2de2fd7070327bdeb54c15a5295309c6fcd2d";
 
 @interface AppDelegate ()
 
@@ -38,7 +16,9 @@ static NSString * const kQiChartboostAppSignature = @"92e2de2fd7070327bdeb54c15a
 @implementation AppDelegate
 
 /**
- *  App launch completion callback.
+ *  App launch completion callback: creates the window, shows the Word Charades
+ *  game page (QiDraw.storyboard) as the root view controller, then initializes
+ *  the AdMob SDK (after the ATT prompt on iOS 14+).
  *
  *  @param application   The current UIApplication instance.
  *  @param launchOptions Launch options (information carried when the app is opened externally).
@@ -46,59 +26,6 @@ static NSString * const kQiChartboostAppSignature = @"92e2de2fd7070327bdeb54c15a
  */
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
-    // FIX-04: Initialize the InMobi SDK before any other InMobi API is used.
-    // The account ID is a placeholder (kQiInMobiAccountID above) — replace it
-    // with the real InMobi account ID before delivery.
-    [IMSdk initWithAccountID:kQiInMobiAccountID andCompletionHandler:^(NSError *_Nullable error) {
-        if (error) {
-#if DEBUG
-            NSLog(@"[AppDelegate] InMobi SDK init failed: %@", error.localizedDescription);
-#endif
-        }
-    }];
-    
-    // FIX-04: Initialize the Vungle / Liftoff SDK. The app ID is a placeholder
-    // (kQiVungleAppID above) — replace it with the real Vungle app ID before
-    // delivery. Ad loading through QiAdManager reports failure until then.
-    [VungleAds initWithAppId:kQiVungleAppID completion:^(NSError *_Nullable error) {
-        if (error) {
-#if DEBUG
-            NSLog(@"[AppDelegate] Vungle SDK init failed: %@", error.localizedDescription);
-#endif
-        }
-#if DEBUG
-        else {
-            NSLog(@"[AppDelegate] Vungle SDK init complete");
-        }
-#endif
-    }];
-    
-    // FIX-04: Start the Chartboost SDK with the demo app credentials
-    // (kQiChartboostAppID / kQiChartboostAppSignature above). Must be called
-    // before any Chartboost ad is cached; data use consent may be set
-    // beforehand in a production integration. Ad caching happens on demand
-    // through QiChartboostAdManager (driven by QiHiddenAdPanel / QiAdManager).
-#if DEBUG
-    [Chartboost setLoggingLevel:CBLoggingLevelInfo];
-#endif
-    [Chartboost startWithAppID:kQiChartboostAppID appSignature:kQiChartboostAppSignature completion:^(CHBStartError *_Nullable error) {
-#if DEBUG
-        if (error) {
-            NSLog(@"[AppDelegate] Chartboost SDK start failed: %@", error);
-        } else {
-            NSLog(@"[AppDelegate] Chartboost SDK started, version %@", [Chartboost getSDKVersion]);
-        }
-#endif
-    }];
-    
-    // FIX-02: AdMob is initialized in qi_initializeAdMobAfterTrackingAuthorization
-    // (after the ATT prompt on iOS 14+, or directly on older iOS), so the SDK can
-    // serve personalized ads when the user grants tracking permission. The app ID
-    // is configured in Info.plist as GADApplicationIdentifier; rewarded / interstitial
-    // ads are loaded on demand through QiAdManager.
-    
-    // Entry point: opening the app goes straight to the Word Charades game page
-    // (QiDraw.storyboard); the Main.storyboard home page is no longer used.
     UIStoryboard *drawStoryboard = [UIStoryboard storyboardWithName:@"QiDraw" bundle:nil];
     QiDrawViewController *drawViewController = [drawStoryboard instantiateInitialViewController];
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:drawViewController];
@@ -107,16 +34,15 @@ static NSString * const kQiChartboostAppSignature = @"92e2de2fd7070327bdeb54c15a
     self.window.rootViewController = navigationController;
     [self.window makeKeyAndVisible];
     
-    // FIX-05: App Tracking Transparency (iOS 14+): request IDFA permission before
-    // initializing AdMob so personalized ads can be served. On iOS < 14 AdMob is
-    // initialized directly. The ATT usage description lives in Info.plist
-    // (NSUserTrackingUsageDescription).
+    // AdMob is initialized after the ATT prompt (iOS 14+) so the SDK can serve
+    // personalized ads when the user grants tracking permission; the App ID is
+    // configured in Info.plist as GADApplicationIdentifier. Rewarded / interstitial
+    // ads are loaded on demand through QiAdManager.
     [self qi_initializeAdMobAfterTrackingAuthorization];
     
-    // FIX-05: UMP consent flow (GDPR / EEA + UK + Brazil). Must be requested before
-    // ads are loaded; QiAdManager loads ads on demand, so consent is normally ready
-    // by the time the first ad is requested. The UMP SDK ships as the
-    // GoogleUserMessagingPlatform SPM dependency.
+    // UMP consent flow (GDPR / EEA + UK + Brazil). Must be requested before ads
+    // are loaded; QiAdManager loads ads on demand, so consent is normally ready
+    // by the time the first ad is requested.
     [self qi_requestConsentFromViewController:self.window.rootViewController];
     
     return YES;

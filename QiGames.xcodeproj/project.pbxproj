@@ -16,31 +16,8 @@
 		06DAFC0821809CAB007E869D /* QiDrawViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 06DAFC0721809CAB007E869D /* QiDrawViewController.m */; };
 		A1B2C3D4E5F6010100000011 /* QiAdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010100000002 /* QiAdManager.m */; };
 		A1B2C3D4E5F6010100000012 /* QiHiddenAdPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010100000004 /* QiHiddenAdPanel.m */; };
-		C1D2E3F4A5B60101000000A7 /* QiInMobiAdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B60101000000A6 /* QiInMobiAdManager.m */; };
-		C1D2E3F4A5B60101000000A2 /* InMobiSDK in Frameworks */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B60101000000A1 /* InMobiSDK.xcframework */; };
-		C1D2E3F4A5B60101000000A3 /* InMobiSDK in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B60101000000A1 /* InMobiSDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		D2E3F4A5B6C70101000000A2 /* VungleAdsSDK in Frameworks */ = {isa = PBXBuildFile; fileRef = D2E3F4A5B6C70101000000A1 /* VungleAdsSDK.xcframework */; };
-		D2E3F4A5B6C70101000000A3 /* VungleAdsSDK in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D2E3F4A5B6C70101000000A1 /* VungleAdsSDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		D1E2F3A4B5C6010100000003 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = D1E2F3A4B5C6010100000002 /* GoogleMobileAds */; };
-		E3F4A5B6C7D80101000000A4 /* ChartboostSDK in Frameworks */ = {isa = PBXBuildFile; fileRef = E3F4A5B6C7D80101000000A1 /* ChartboostSDK.xcframework */; };
-		E3F4A5B6C7D80101000000A5 /* QiChartboostAdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E3F4A5B6C7D80101000000A3 /* QiChartboostAdManager.m */; };
-		E1F2A3B4C5D60101000000A1 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E1F2A3B4C5D60101000000A2 /* PrivacyInfo.xcprivacy */; };
+		A96D93BCA6875081847362EA /* Pods_QiGames.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF83A83D10E1948F3A6C6A19 /* Pods_QiGames.framework */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		C1D2E3F4A5B60101000000A4 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				C1D2E3F4A5B60101000000A3 /* InMobiSDK in Embed Frameworks */,
-				D2E3F4A5B6C70101000000A3 /* VungleAdsSDK in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		06371814217DE33A004FE349 /* QiGames.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QiGames.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -59,14 +36,9 @@
 		A1B2C3D4E5F6010100000002 /* QiAdManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QiAdManager.m; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010100000003 /* QiHiddenAdPanel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QiHiddenAdPanel.h; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010100000004 /* QiHiddenAdPanel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QiHiddenAdPanel.m; sourceTree = "<group>"; };
-		C1D2E3F4A5B60101000000A1 /* InMobiSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = InMobiSDK.xcframework; path = "QiGames/Vendor/InMobi/InMobiSDK.xcframework"; sourceTree = "<group>"; };
-		C1D2E3F4A5B60101000000A5 /* QiInMobiAdManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QiInMobiAdManager.h; sourceTree = "<group>"; };
-		C1D2E3F4A5B60101000000A6 /* QiInMobiAdManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QiInMobiAdManager.m; sourceTree = "<group>"; };
-		D2E3F4A5B6C70101000000A1 /* VungleAdsSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = VungleAdsSDK.xcframework; path = "QiGames/Vendor/Vungle/VungleAdsSDK.xcframework"; sourceTree = "<group>"; };
-		E3F4A5B6C7D80101000000A1 /* ChartboostSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ChartboostSDK.xcframework; path = "QiGames/Vendor/Chartboost/ChartboostSDK.xcframework"; sourceTree = "<group>"; };
-		E3F4A5B6C7D80101000000A2 /* QiChartboostAdManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QiChartboostAdManager.h; sourceTree = "<group>"; };
-		E3F4A5B6C7D80101000000A3 /* QiChartboostAdManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QiChartboostAdManager.m; sourceTree = "<group>"; };
-		E1F2A3B4C5D60101000000A2 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		0FBEB3D34C1DBDFFBFB94C9D /* Pods-QiGames.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QiGames.debug.xcconfig"; path = "Target Support Files/Pods-QiGames/Pods-QiGames.debug.xcconfig"; sourceTree = "<group>"; };
+		AF83A83D10E1948F3A6C6A19 /* Pods_QiGames.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_QiGames.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D57597EFC11046F88AD60933 /* Pods-QiGames.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QiGames.release.xcconfig"; path = "Target Support Files/Pods-QiGames/Pods-QiGames.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,16 +46,23 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C1D2E3F4A5B60101000000A2 /* InMobiSDK in Frameworks */,
-				D2E3F4A5B6C70101000000A2 /* VungleAdsSDK in Frameworks */,
-				D1E2F3A4B5C6010100000003 /* GoogleMobileAds in Frameworks */,
-				E3F4A5B6C7D80101000000A4 /* ChartboostSDK in Frameworks */,
+				A96D93BCA6875081847362EA /* Pods_QiGames.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0023C6E873CBDB3AE6E6C573 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				0FBEB3D34C1DBDFFBFB94C9D /* Pods-QiGames.debug.xcconfig */,
+				D57597EFC11046F88AD60933 /* Pods-QiGames.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		0637180B217DE33A004FE349 = {
 			isa = PBXGroup;
 			children = (
@@ -91,6 +70,7 @@
 				06371816217DE33A004FE349 /* QiGames */,
 				06371815217DE33A004FE349 /* Products */,
 				DE892D891764AA0469501DCA /* Frameworks */,
+				0023C6E873CBDB3AE6E6C573 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -111,17 +91,12 @@
 				A1B2C3D4E5F6010100000002 /* QiAdManager.m */,
 				A1B2C3D4E5F6010100000003 /* QiHiddenAdPanel.h */,
 				A1B2C3D4E5F6010100000004 /* QiHiddenAdPanel.m */,
-				C1D2E3F4A5B60101000000A5 /* QiInMobiAdManager.h */,
-				C1D2E3F4A5B60101000000A6 /* QiInMobiAdManager.m */,
-				E3F4A5B6C7D80101000000A2 /* QiChartboostAdManager.h */,
-				E3F4A5B6C7D80101000000A3 /* QiChartboostAdManager.m */,
 				06DAFBFC21805385007E869D /* QiSpeechManager.h */,
 				06DAFBFD21805385007E869D /* QiSpeechManager.m */,
 				06DAFC0521809C92007E869D /* QiDraw */,
 				06371820217DE33D004FE349 /* Assets.xcassets */,
 				06371822217DE33D004FE349 /* LaunchScreen.storyboard */,
 				06371825217DE33D004FE349 /* Info.plist */,
-				E1F2A3B4C5D60101000000A2 /* PrivacyInfo.xcprivacy */,
 				06371826217DE33D004FE349 /* main.m */,
 			);
 			path = QiGames;
@@ -139,9 +114,7 @@
 		DE892D891764AA0469501DCA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C1D2E3F4A5B60101000000A1 /* InMobiSDK.xcframework */,
-				D2E3F4A5B6C70101000000A1 /* VungleAdsSDK.xcframework */,
-				E3F4A5B6C7D80101000000A1 /* ChartboostSDK.xcframework */,
+				AF83A83D10E1948F3A6C6A19 /* Pods_QiGames.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -153,19 +126,18 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0637182A217DE33D004FE349 /* Build configuration list for PBXNativeTarget "QiGames" */;
 			buildPhases = (
+				AE8290DB855EFF73851E321B /* [CP] Check Pods Manifest.lock */,
 				06371810217DE33A004FE349 /* Sources */,
 				06371811217DE33A004FE349 /* Frameworks */,
 				06371812217DE33A004FE349 /* Resources */,
-				C1D2E3F4A5B60101000000A4 /* Embed Frameworks */,
+				EF02E17F64C108BAA1975F46 /* [CP] Embed Pods Frameworks */,
+				CA3C30A463F7B057412B58CC /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = QiGames;
-			packageProductDependencies = (
-				D1E2F3A4B5C6010100000002 /* GoogleMobileAds */,
-			);
 			productName = QiGames;
 			productReference = 06371814217DE33A004FE349 /* QiGames.app */;
 			productType = "com.apple.product-type.application";
@@ -193,9 +165,6 @@
 				Base,
 			);
 			mainGroup = 0637180B217DE33A004FE349;
-			packageReferences = (
-				D1E2F3A4B5C6010100000001 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
-			);
 			productRefGroup = 06371815217DE33A004FE349 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -213,11 +182,69 @@
 				06371824217DE33D004FE349 /* LaunchScreen.storyboard in Resources */,
 				06371821217DE33D004FE349 /* Assets.xcassets in Resources */,
 				06DAFC0421809C61007E869D /* QiDraw.storyboard in Resources */,
-				E1F2A3B4C5D60101000000A1 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		AE8290DB855EFF73851E321B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-QiGames-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CA3C30A463F7B057412B58CC /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-QiGames/Pods-QiGames-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-QiGames/Pods-QiGames-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-QiGames/Pods-QiGames-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		EF02E17F64C108BAA1975F46 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-QiGames/Pods-QiGames-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-QiGames/Pods-QiGames-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-QiGames/Pods-QiGames-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		06371810217DE33A004FE349 /* Sources */ = {
@@ -230,8 +257,6 @@
 				06371819217DE33A004FE349 /* AppDelegate.m in Sources */,
 				A1B2C3D4E5F6010100000011 /* QiAdManager.m in Sources */,
 				A1B2C3D4E5F6010100000012 /* QiHiddenAdPanel.m in Sources */,
-				C1D2E3F4A5B60101000000A7 /* QiInMobiAdManager.m in Sources */,
-				E3F4A5B6C7D80101000000A5 /* QiChartboostAdManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -371,6 +396,7 @@
 		};
 		0637182B217DE33D004FE349 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0FBEB3D34C1DBDFFBFB94C9D /* Pods-QiGames.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -381,9 +407,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = "$(inherited) -ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.qishare.ios.hxs;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				OTHER_LDFLAGS = "-ObjC";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 x86_64";
 			};
@@ -391,6 +417,7 @@
 		};
 		0637182C217DE33D004FE349 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D57597EFC11046F88AD60933 /* Pods-QiGames.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -401,9 +428,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = "$(inherited) -ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.qishare.ios.hxs;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				OTHER_LDFLAGS = "-ObjC";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 x86_64";
 			};
@@ -431,25 +458,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		D1E2F3A4B5C6010100000001 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads";
-			requirement = {
-				kind = exactVersion;
-				version = 11.7.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		D1E2F3A4B5C6010100000002 /* GoogleMobileAds */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D1E2F3A4B5C6010100000001 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
-			productName = GoogleMobileAds;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0637180C217DE33A004FE349 /* Project object */;
 }

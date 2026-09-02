@@ -28,8 +28,6 @@
 	<string>Word Charades needs microphone access to recognize spoken answers during the game.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Word Charades uses speech recognition to detect the words you say during gameplay.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Your approximate location is used to serve more relevant ads and marketing.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>We use your device identifier to provide more relevant ads and marketing content.</string>
 	<key>SKAdNetworkItems</key>
@@ -50,7 +48,6 @@
 			<key>SKAdNetworkIdentifier</key>
 			<string>ydx93a7ass.skadnetwork</string>
 		</dict>
-		<string></string>
 		<dict>
 			<key>SKAdNetworkIdentifier</key>
 			<string>p78axxw29g.skadnetwork</string>

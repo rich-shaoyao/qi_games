@@ -2,12 +2,14 @@
 //  QiAdManager.h
 //  QiGames
 //
-//  Ad management abstraction: provides a unified entry point for loading and
-//  playing rewarded video and interstitial ads. It integrates the real AdMob
-//  (GoogleMobileAds v11.3.0; the local Xcode 15.2-compatible version should be
-//  bumped back to v11.7.0 in an Xcode 16 environment before delivery)
-//  implementation while keeping the public API unchanged; ad unit IDs live at
-//  the top of the implementation file.
+//  Ad management abstraction: unified entry point for loading and playing
+//  rewarded video and interstitial ads. Currently integrates the real AdMob
+//  implementation (Google-Mobile-Ads-SDK 11.7.0, integrated via CocoaPods);
+//  ad unit IDs are defined centrally at the top of the implementation file.
+//  The QiAdPlatform enum additionally lists the other five ad networks
+//  (Meta / Vungle / Chartboost / InMobi / Unity Ads) installed via CocoaPods —
+//  they are shown in the hidden ad panel as placeholders until their platform
+//  IDs and adapters are configured.
 //
 
 #import <Foundation/Foundation.h>
@@ -23,13 +25,17 @@ typedef NS_ENUM(NSUInteger, QiAdType) {
 };
 
 /**
- *  Ad network platform enum.
+ *  Ad network platform enum (display order in the hidden ad panel = row order).
+ *  Only QiAdPlatformAdMob has a real implementation; the rest are placeholders
+ *  until their platform IDs and integration are configured.
  */
 typedef NS_ENUM(NSUInteger, QiAdPlatform) {
-    QiAdPlatformAdMob,  //!< AdMob (GoogleMobileAds, integrated via SPM)
-    QiAdPlatformVungle, //!< Vungle / Liftoff (VungleAds 7.0.0, manual xcframework)
-    QiAdPlatformInMobi, //!< InMobi (InMobiSDK 11.4.0, manual xcframework)
-    QiAdPlatformChartboost, //!< Chartboost (ChartboostSDK 9.14.0, manual xcframework; links with Xcode 26 toolchain)
+    QiAdPlatformAdMob,     //!< AdMob (Google-Mobile-Ads-SDK 11.7.0, via CocoaPods; real implementation)
+    QiAdPlatformMeta,      //!< Meta Audience Network (FBAudienceNetwork, placeholder)
+    QiAdPlatformVungle,    //!< Vungle / Liftoff (VungleSDK-iOS, placeholder)
+    QiAdPlatformChartboost,//!< Chartboost (ChartboostSDK, placeholder)
+    QiAdPlatformInMobi,    //!< InMobi (InMobiSDK, placeholder)
+    QiAdPlatformUnityAds,  //!< Unity Ads (UnityAds, placeholder)
 };
 
 /**
@@ -41,7 +47,7 @@ typedef void (^QiAdLoadCompletion)(BOOL success);
 
 /**
  *  Ad manager: unified entry point for loading and playing rewarded /
- *  interstitial ads.
+ *  interstitial ads (AdMob implementation).
  */
 @interface QiAdManager : NSObject
 
@@ -62,16 +68,6 @@ typedef void (^QiAdLoadCompletion)(BOOL success);
 - (void)loadAdOfType:(QiAdType)type completion:(QiAdLoadCompletion)completion;
 
 /**
- *  Loads the given ad type on the given platform (AdMob / Vungle).
- *
- *  @param type       Ad type (QiAdTypeRewarded / QiAdTypeInterstitial).
- *  @param platform   Ad network platform (QiAdPlatformAdMob / QiAdPlatformVungle).
- *  @param completion Load completion callback (success indicates whether the load succeeded).
- *  @return None.
- */
-- (void)loadAdOfType:(QiAdType)type platform:(QiAdPlatform)platform completion:(QiAdLoadCompletion)completion;
-
-/**
  *  Plays the given ad type (calls the matching AdMob show API).
  *  Automatically reloads that ad type after playback finishes.
  *
@@ -82,25 +78,13 @@ typedef void (^QiAdLoadCompletion)(BOOL success);
 - (void)showAdOfType:(QiAdType)type completion:(QiAdLoadCompletion)completion;
 
 /**
- *  Plays the given ad type on the given platform (AdMob / Vungle).
- *  Automatically reloads that ad type after playback finishes.
+ *  Returns whether the given ad type is loaded and ready to play
+ *  (canPresent pre-check; does not trigger a load).
  *
- *  @param type       Ad type (QiAdTypeRewarded / QiAdTypeInterstitial).
- *  @param platform   Ad network platform (QiAdPlatformAdMob / QiAdPlatformVungle).
- *  @param completion Callback after playback and reload (success indicates whether the reload succeeded).
- *  @return None.
- */
-- (void)showAdOfType:(QiAdType)type platform:(QiAdPlatform)platform completion:(QiAdLoadCompletion)completion;
-
-/**
- *  Returns whether the given ad type is loaded and ready to play on the given
- *  platform (canPlayAd / isReady pre-check; does not trigger a load).
- *
- *  @param type     Ad type (QiAdTypeRewarded / QiAdTypeInterstitial).
- *  @param platform Ad network platform (QiAdPlatformAdMob / QiAdPlatformVungle / QiAdPlatformInMobi).
+ *  @param type Ad type (QiAdTypeRewarded / QiAdTypeInterstitial).
  *  @return YES if the ad is ready to play; NO otherwise.
  */
-- (BOOL)isAdReadyOfType:(QiAdType)type platform:(QiAdPlatform)platform;
+- (BOOL)isAdReadyOfType:(QiAdType)type;
 
 @end
 

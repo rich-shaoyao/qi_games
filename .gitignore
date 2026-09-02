@@ -16,3 +16,6 @@ xcuserdata/
 *.ipa
 *.xcarchive
 *.dSYM.zip
+
+# CocoaPods
+Pods/

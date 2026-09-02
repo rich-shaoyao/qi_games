@@ -24,10 +24,12 @@
 #import "QiHiddenAdPanel.h"
 #import "QiAdManager.h"
 
-static NSString * const kQiPlatformNameAdMob   = @"AdMob";
-static NSString * const kQiPlatformNameVungle  = @"Vungle";
-static NSString * const kQiPlatformNameInMobi  = @"InMobi";
+static NSString * const kQiPlatformNameAdMob      = @"AdMob";
+static NSString * const kQiPlatformNameMeta       = @"Meta";
+static NSString * const kQiPlatformNameVungle     = @"Vungle";
 static NSString * const kQiPlatformNameChartboost = @"Chartboost";
+static NSString * const kQiPlatformNameInMobi     = @"InMobi";
+static NSString * const kQiPlatformNameUnityAds   = @"Unity Ads";
 
 @interface QiHiddenAdPanel ()
 
@@ -53,10 +55,24 @@ static NSString * const kQiPlatformNameChartboost = @"Chartboost";
 static QiHiddenAdPanel *_sharedPanel = nil;
 
 /**
- *  The list of supported platforms (order = row order inside a column).
+ *  The list of shown platforms (order = row order inside a column). Only AdMob
+ *  has a real implementation; the others are placeholders until their platform
+ *  IDs and integration are configured.
  */
 static NSArray<NSNumber *> *QiPanelPlatforms(void) {
-    return @[ @(QiAdPlatformAdMob), @(QiAdPlatformVungle), @(QiAdPlatformInMobi), @(QiAdPlatformChartboost) ];
+    return @[ @(QiAdPlatformAdMob), @(QiAdPlatformMeta), @(QiAdPlatformVungle),
+              @(QiAdPlatformChartboost), @(QiAdPlatformInMobi), @(QiAdPlatformUnityAds) ];
+}
+
+/**
+ *  Returns whether the given platform is actually connected (loadable / playable).
+ *  Only AdMob is integrated for now; the remaining five platforms are placeholders.
+ *
+ *  @param platform Ad network platform.
+ *  @return YES if the platform has a real implementation; NO otherwise.
+ */
+static BOOL QiPlatformConnected(QiAdPlatform platform) {
+    return (platform == QiAdPlatformAdMob);
 }
 
 #pragma mark - Lifecycle
@@ -128,10 +144,16 @@ static NSArray<NSNumber *> *QiPanelPlatforms(void) {
     [self buildContainer];
     [_overlayView addSubview:_containerView];
     
-    // First open: automatically load all platform ads (rewarded + interstitial)
+    // First open: auto-load ads for connected platforms (AdMob rewarded +
+    // interstitial); placeholder platforms show as "not configured" (grayed).
     for (NSNumber *platformNumber in QiPanelPlatforms()) {
         QiAdPlatform platform = [platformNumber integerValue];
         NSString *platformName = [self platformName:platform];
+        if (!QiPlatformConnected(platform)) {
+            [self setButtonForType:QiAdTypeRewarded platform:platform enabled:NO title:[NSString stringWithFormat:@"%@\n未接入", platformName]];
+            [self setButtonForType:QiAdTypeInterstitial platform:platform enabled:NO title:[NSString stringWithFormat:@"%@\n未接入", platformName]];
+            continue;
+        }
         [self setButtonForType:QiAdTypeRewarded platform:platform enabled:NO title:[NSString stringWithFormat:@"%@\nLoading...", platformName]];
         [self setButtonForType:QiAdTypeInterstitial platform:platform enabled:NO title:[NSString stringWithFormat:@"%@\nLoading...", platformName]];
         [self loadAdForType:QiAdTypeRewarded platform:platform];
@@ -165,7 +187,7 @@ static NSArray<NSNumber *> *QiPanelPlatforms(void) {
 - (void)buildContainer {
     
     CGFloat panelWidth = MIN(320.0, CGRectGetWidth(_overlayView.bounds) - 32.0);
-    CGFloat panelHeight = 296.0;
+    CGFloat panelHeight = 400.0;
     _containerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, panelWidth, panelHeight)];
     _containerView.center = CGPointMake(CGRectGetMidX(_overlayView.bounds), CGRectGetMidY(_overlayView.bounds));
     _containerView.backgroundColor = [UIColor colorWithWhite:0.16 alpha:0.98];
@@ -178,7 +200,7 @@ static NSArray<NSNumber *> *QiPanelPlatforms(void) {
     
     CGFloat columnGap = 12.0;
     CGFloat columnWidth = (panelWidth - 32.0 - columnGap) / 2.0; //!< Column width (including 16pt side margins)
-    CGFloat columnHeight = 240.0; //!< Fits 4 platform rows (AdMob / Vungle / InMobi / Chartboost)
+    CGFloat columnHeight = 346.0; //!< Fits 6 platform rows (AdMob / Meta / Vungle / Chartboost / InMobi / Unity Ads)
     CGFloat columnTop = 12.0;
     
     // Close button (✕ top-right)
@@ -308,9 +330,11 @@ static NSArray<NSNumber *> *QiPanelPlatforms(void) {
  */
 - (NSString *)platformName:(QiAdPlatform)platform {
     
+    if (platform == QiAdPlatformMeta) { return kQiPlatformNameMeta; }
     if (platform == QiAdPlatformVungle) { return kQiPlatformNameVungle; }
-    if (platform == QiAdPlatformInMobi) { return kQiPlatformNameInMobi; }
     if (platform == QiAdPlatformChartboost) { return kQiPlatformNameChartboost; }
+    if (platform == QiAdPlatformInMobi) { return kQiPlatformNameInMobi; }
+    if (platform == QiAdPlatformUnityAds) { return kQiPlatformNameUnityAds; }
     return kQiPlatformNameAdMob;
 }
 
@@ -370,8 +394,9 @@ static NSArray<NSNumber *> *QiPanelPlatforms(void) {
  */
 - (void)loadAdForType:(QiAdType)type platform:(QiAdPlatform)platform {
     
+    if (!QiPlatformConnected(platform)) { return; }
     __weak typeof(self) weakSelf = self;
-    [[QiAdManager sharedManager] loadAdOfType:type platform:platform completion:^(BOOL success) {
+    [[QiAdManager sharedManager] loadAdOfType:type completion:^(BOOL success) {
         __strong typeof(weakSelf) self = weakSelf;
         if (!self) { return; }
         
@@ -444,12 +469,13 @@ static NSArray<NSNumber *> *QiPanelPlatforms(void) {
  */
 - (void)playAdForType:(QiAdType)type platform:(QiAdPlatform)platform {
     
+    if (!QiPlatformConnected(platform)) { return; }
     NSNumber *key = [self keyForType:type platform:platform];
     NSString *platformName = [self platformName:platform];
     [self setButtonForType:type platform:platform enabled:NO title:[NSString stringWithFormat:@"%@\nPlaying...", platformName]];
     
     __weak typeof(self) weakSelf = self;
-    [[QiAdManager sharedManager] showAdOfType:type platform:platform completion:^(BOOL success) {
+    [[QiAdManager sharedManager] showAdOfType:type completion:^(BOOL success) {
         __strong typeof(weakSelf) self = weakSelf;
         if (!self) { return; }
         
