@@ -24,6 +24,12 @@
 #import "QiHiddenAdPanel.h"
 #import "QiAdManager.h"
 
+// The whole implementation below is compiled only when the hidden ad panel
+// switch is on (default 1). App Store packaging compiles with the switch off
+// (see QiHiddenAdPanel.h / Configs/AppStore.xcconfig), excluding this file's
+// contents from the binary entirely.
+#if HIDDEN_AD_PANEL_ENABLED
+
 static NSString * const kQiPlatformNameAdMob      = @"AdMob";
 static NSString * const kQiPlatformNameMeta       = @"Meta";
 static NSString * const kQiPlatformNameVungle     = @"Vungle";
@@ -638,3 +644,5 @@ static BOOL QiPlatformConnected(QiAdPlatform platform) {
 }
 
 @end
+
+#endif // HIDDEN_AD_PANEL_ENABLED

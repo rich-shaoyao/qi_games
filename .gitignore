@@ -19,3 +19,6 @@ xcuserdata/
 
 # CocoaPods
 Pods/
+
+# Signing credentials (never commit: private key material)
+cer/

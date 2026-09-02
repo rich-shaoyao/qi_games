@@ -1,0 +1,19 @@
+// App Store 上架专用编译配置（仓库根 /Configs/AppStore.xcconfig）
+//
+// 作用：上架 App Store 的包必须关闭隐藏广告面板——把 HIDDEN_AD_PANEL_ENABLED 置 0，
+//       使 QiDrawViewController.m 的触发逻辑与 QiHiddenAdPanel.m 的面板实现
+//       均不参与编译（源码无需删除）。隐藏面板属于隐蔽触发功能，随包上架有
+//       被 App Review 拒绝的风险。
+//
+// 渠道验证包（交付发行渠道）不需要本文件：开关默认 = 1（见 QiGames/QiHiddenAdPanel.h）。
+//
+// 用法（任选其一，二选一即可）：
+//   1) 本地 Xcode：
+//        xcodebuild -workspace QiGames.xcworkspace -scheme QiGames \
+//          -configuration Release -destination 'generic/platform=iOS' \
+//          -xcconfig Configs/AppStore.xcconfig archive -archivePath build/AppStore.xcarchive
+//   2) GitHub Actions：手动运行 "CI Package" workflow，将 app_store 输入设为 true
+//      （该 workflow 自动附加本文件，需同时配置好 App Store 签名 secrets）。
+//
+// 注意：$(inherited) 保留工程内（含 Pods）原有预处理器定义，避免覆盖 Debug/Release 自带项。
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) HIDDEN_AD_PANEL_ENABLED=0

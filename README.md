@@ -148,12 +148,32 @@ plutil -lint QiGames/Info.plist
 
 面板触发文本 `show**show**show`（插件通过根页面 `QiDrawViewController` 上的 1px×1px `UITextField.text` 赋值触发）。DEBUG 构建支持启动参数 `-qiSimulateAdPanelTrigger` 与真机五连点触发。预期链路日志（DEBUG）：`[QiHiddenAdPanel] show` → AdMob 行 `type=0/1 loaded=1`；面板中 Meta / Vungle / Chartboost / InMobi / Unity Ads 行显示「未接入」灰态。
 
+### App Store 上架打包
+
+隐藏广告面板是**隐蔽触发功能**，App Review 一旦发现会拒绝；上架包必须关闭该功能（不必删代码，仅切换宏）：
+
+| 产物 | 开关值 | 打包方式 |
+| --- | --- | --- |
+| 渠道验证包（发行渠道交付） | `HIDDEN_AD_PANEL_ENABLED = 1`（默认） | `package.yml` 直接打包 / 本地普通 Release |
+| App Store 上架包 | `HIDDEN_AD_PANEL_ENABLED = 0` | 见下方两种方式 |
+
+- **本地**（需新版 Xcode，本机 15.2 无法完整链接广告 SDK，见上节）：
+  ```bash
+  xcodebuild -workspace QiGames.xcworkspace -scheme QiGames \
+    -configuration Release -destination 'generic/platform=iOS' \
+    -xcconfig Configs/AppStore.xcconfig \
+    archive -archivePath build/AppStore.xcarchive
+  ```
+- **GitHub Actions 云打包**（推荐，衔接全局 skill `github-ios-package`）：手动运行 `CI Package` workflow，`configuration = Release`、**`app_store = true`**，并需已配置 App Store 签名 secrets（`DIST_CERT_P12` / `DIST_CERT_PASSWORD` / `PROVISIONING_PROFILE` / `DEVELOPER_TEAM_ID` / `PROVISIONING_PROFILE_SPECIFIER`）；若 `app_store=true` 而未配置签名 secrets，workflow 会报错退出。
+- 拿到 App Store 签名 ipa 后：用 **Transporter** 上传 App Store Connect → 在 App Store Connect 完成该构建的元数据与审核信息 → 提交审核。
+- 上架前记得把广告位换成 **AdMob 正式 ID**（`QiAdManager.m` 顶部常量 + `Info.plist` `GADApplicationIdentifier`）；用官方测试 ID 上架虽能过加载流程，但无真实广告收益，且不符合 AdMob 生产使用预期。
+
 ### 架构说明
 
 - **依赖管理**：CocoaPods 引入六家广告平台（`Google-Mobile-Ads-SDK = 11.7.0` + 五家最新稳定版）；版本锁定于 `Podfile.lock`。`Pods/` 忽略入库，`Podfile / Podfile.lock / QiGames.xcworkspace` 入库。
 - **广告抽象层 `QiAdManager`**：平台无关设计（`QiAdType` / 单例 / 加载回调），当前实现为 AdMob（`GADRewardedAd` / `GADInterstitialAd`）；`QiAdPlatform` 枚举承载六平台，为后续平台适配预留。广告位 ID 集中定义于 `QiAdManager.m` 顶部常量，`GADApplicationIdentifier` 在 `Info.plist`。
 - **隐藏广告面板 `QiHiddenAdPanel`**：两栏（Rewarded Video / Interstitial）× 六平台行；AdMob 真接入（加载 → 高亮 → 播放 → 重拉 → 5-10 秒倒计时），五平台占位；弹出后不弹 Toast / 弹窗，反馈收敛在按钮文案。
-- **面板触发开关**：`QiDrawViewController.m` 中 `HIDDEN_AD_PANEL_ENABLED` 宏（默认 1）。
+- **面板触发开关**：`HIDDEN_AD_PANEL_ENABLED` 集中定义于 `QiHiddenAdPanel.h`（**默认 1** = 启用）。App Store 上架包通过 `Configs/AppStore.xcconfig` 置 0（见下文「App Store 上架打包」），触发逻辑与 `QiHiddenAdPanel.m` 整体不参与编译，无需删代码。
 - **语音识别 `QiSpeechManager`**：基于 `SFSpeechRecognizer` + `AVAudioEngine`，已实现但当前未启用。
 
 ### 代码规范

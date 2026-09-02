@@ -3,12 +3,18 @@
 # 用途：在 GitHub 云环境构建 Release/Debug 包并产出 ipa，下载回本地安装/测试；
 #       上架前验证构建链路。
 #
-# 两种模式（自动判断，依据是否配置签名 secrets）：
+# 打包产物两种形态（依据是否配置签名 secrets）：
 #   1) 未提供签名 secrets -> 未签名 ipa（CODE_SIGNING_ALLOWED=NO），可下载后用 Sideloadly 自签安装
-#   2) 提供签名 secrets    -> App Store 签名 ipa，可再配合上传流程提交 App Store Connect
+#   2) 提供签名 secrets    -> App Store 签名 ipa，可配合 Transporter 上传 App Store Connect
+#
+# 隐藏广告面板开关（workflow_dispatch 输入 app_store）：
+#   - app_store = false（默认）：隐藏广告面板启用（HIDDEN_AD_PANEL_ENABLED=1，源码默认），
+#     产物为渠道验证包（含 show**show**show 触发），用于发行渠道广告验证。
+#   - app_store = true：附加 Configs/AppStore.xcconfig 把 HIDDEN_AD_PANEL_ENABLED 置 0，
+#     面板与触发逻辑不编译，产物为可上架包（需同时配置签名 secrets，否则本 workflow 报错退出）。
 #
 # 注意：GitHub Actions 的 if: 条件不能直接引用 secrets，因此签名判断用 job 级 env 标志实现。
-# 触发：推送 main 自动打包；也可在 Actions 页面手动 Run workflow
+# 触发：推送 main 自动打包（渠道包）；也可在 Actions 页面手动 Run workflow
 name: CI Package (pre-release verification)
 
 on:
@@ -22,6 +28,11 @@ on:
         options:
           - Release
           - Debug
+      app_store:
+        description: 'App Store 上架模式：关闭隐藏广告面板（需配置签名 secrets）'
+        required: false
+        default: false
+        type: boolean
   push:
     branches: [ main ]
 
@@ -31,6 +42,7 @@ jobs:
     env:
       HAS_CERT: ${{ secrets.DIST_CERT_P12 != '' }}
       CONFIGURATION: ${{ github.event.inputs.configuration || 'Release' }}
+      APP_STORE: ${{ github.event.inputs.app_store || 'false' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -56,14 +68,26 @@ jobs:
         run: |
           pod install
 
+      - name: App Store mode requires signing secrets
+        if: env.APP_STORE == 'true' && env.HAS_CERT == 'false'
+        run: |
+          echo "::error::app_store=true 需要已配置 App Store 签名 secrets（DIST_CERT_P12 / DIST_CERT_PASSWORD / PROVISIONING_PROFILE / DEVELOPER_TEAM_ID / PROVISIONING_PROFILE_SPECIFIER）。未签名包无法上传 App Store Connect，请先配置 secrets 或改回 app_store=false。"
+          exit 1
+
       - name: Archive (unsigned by default; signed when cert secrets configured)
         env:
           CERT_P12: ${{ secrets.DIST_CERT_P12 }}
           TEAM_ID: ${{ secrets.DEVELOPER_TEAM_ID }}
           PROFILE_SPECIFIER: ${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}
         run: |
+          # App Store mode appends AppStore.xcconfig to disable the hidden ad
+          # panel (HIDDEN_AD_PANEL_ENABLED=0); channel builds omit it (switch = 1).
+          XCCONFIG_OPTS=""
+          if [ "$APP_STORE" = "true" ]; then
+            XCCONFIG_OPTS="-xcconfig Configs/AppStore.xcconfig"
+          fi
           if [ -n "$CERT_P12" ]; then
-            xcodebuild archive \
+            xcodebuild archive $XCCONFIG_OPTS \
               -workspace QiGames.xcworkspace -scheme QiGames \
               -configuration $CONFIGURATION \
               -destination 'generic/platform=iOS' \
@@ -73,7 +97,7 @@ jobs:
               PROVISIONING_PROFILE_SPECIFIER="$PROFILE_SPECIFIER" \
               -allowProvisioningUpdates
           else
-            xcodebuild archive \
+            xcodebuild archive $XCCONFIG_OPTS \
               -workspace QiGames.xcworkspace -scheme QiGames \
               -configuration $CONFIGURATION \
               -destination 'generic/platform=iOS' \

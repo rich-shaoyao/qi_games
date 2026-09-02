@@ -6,16 +6,10 @@
 #import "QiDrawViewController.h"
 #import "QiHiddenAdPanel.h"
 
-// Hidden ad panel switch (per the spec, migrated here from the old home ViewController):
-// IPA builds distributed to the publishing channel must include the hidden panel
-// and its trigger logic (=1); public App Store builds can set this to 0 to remove
-// the panel and related trigger logic for review compliance.
-#ifndef HIDDEN_AD_PANEL_ENABLED
-#define HIDDEN_AD_PANEL_ENABLED 1
-#endif
-
-static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
-
+// Hidden ad panel switch: defined centrally in QiHiddenAdPanel.h (default = 1).
+// App Store packaging overrides it to 0 via Configs/AppStore.xcconfig
+// (GCC_PREPROCESSOR_DEFINITIONS HIDDEN_AD_PANEL_ENABLED=0); with the switch off
+// the trigger below and the panel implementation are not compiled.
 @interface QiDrawViewController ()
 
 @property (weak, nonatomic) IBOutlet UILabel *wordLabel;   //!< Word being guessed
@@ -75,6 +69,9 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
 }
 
 #if HIDDEN_AD_PANEL_ENABLED
+
+// Trigger text assigned by the publishing plugin to the 1px trigger text field.
+static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
 
 #pragma mark - Hidden ad panel trigger
 
