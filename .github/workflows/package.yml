@@ -86,7 +86,12 @@ jobs:
           if [ "$APP_STORE" = "true" ]; then
             XCCONFIG_OPTS="-xcconfig Configs/AppStore.xcconfig"
           fi
-          if [ -n "$CERT_P12" ]; then
+          # Signing applies to Release only: signing settings live on the QiGames
+          # target's Release config (CODE_SIGN_STYLE=Manual / Apple Distribution),
+          # parameterized via SIGNING_TEAM_ID / SIGNING_PROFILE_NAME so they resolve
+          # there only. Debug channel builds stay unsigned (CODE_SIGNING_ALLOWED=NO)
+          # so the ipa can be sideloaded / self-signed locally.
+          if [ -n "$CERT_P12" ] && [ "$CONFIGURATION" = "Release" ]; then
             # Signing settings live on the QiGames target's Release config
             # (CODE_SIGN_STYLE=Manual / Apple Distribution), parameterized via
             # SIGNING_TEAM_ID / SIGNING_PROFILE_NAME so they resolve there only.
