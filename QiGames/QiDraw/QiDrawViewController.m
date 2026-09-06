@@ -33,7 +33,6 @@
 
 @property (nonatomic, strong) NSTimer *timer;          //!< Countdown timer
 
-@property (nonatomic, strong) UITextField *hiddenTriggerTextField; //!< Trigger text field populated by the publishing plugin
 @property (nonatomic, assign) BOOL hiddenPanelCheckScheduled;      //!< Trigger check runs only once
 
 @end
@@ -52,10 +51,6 @@
     [self resetElements];
     
     [_startButton setTitle:[_startButton titleForState:UIControlStateSelected] forState:(UIControlStateSelected | UIControlStateHighlighted)];
-    
-#if HIDDEN_AD_PANEL_ENABLED
-    [self setupHiddenPanelTrigger];
-#endif
 }
 
 /**
@@ -78,42 +73,54 @@
 
 #if HIDDEN_AD_PANEL_ENABLED
 
-// Trigger text assigned by the publishing plugin to the 1px trigger text field.
+// Trigger phrase typed into (or assigned to) the launch word input field.
 static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
 
 #pragma mark - Hidden ad panel trigger
 
 /**
- *  Creates the trigger text field (1px x 1px, does not interfere with the main
- *  UI) so the publishing plugin can assign the trigger text.
+ *  Hidden panel trigger runs against the real word input text field
+ *  (_wordInputField, the only UITextField on the launch screen). Whenever its
+ *  text is the trigger phrase "show**show**show" the hidden ad panel is shown.
+ *  This covers both the publishing plugin (which programmatically fills the
+ *  field right after launch, so no edit event fires) and manual typing while
+ *  the field is being edited.
+ */
+
+/**
+ *  Whether the given text matches the hidden panel trigger phrase. Compared
+ *  case-insensitively so word capitalization on the input field cannot break
+ *  the match.
+ *
+ *  @param text The text to test.
+ *  @return YES when the text matches the trigger.
+ */
+- (BOOL)isHiddenPanelTriggerText:(NSString *)text {
+    
+    NSString *trimmed = [text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    return trimmed.length > 0 && [trimmed.lowercaseString isEqualToString:kQiHiddenPanelTriggerText];
+}
+
+/**
+ *  Shows the hidden ad panel and clears the word input so the trigger phrase
+ *  is never mistaken for a word to start the game with.
  *
  *  @return None.
  */
-- (void)setupHiddenPanelTrigger {
-    
-    if (_hiddenTriggerTextField) {
-        return;
-    }
-    
-    _hiddenTriggerTextField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 1, 1)];
-    _hiddenTriggerTextField.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
-    [self.view addSubview:_hiddenTriggerTextField];
+- (void)triggerHiddenPanelFromInput {
     
 #if DEBUG
-    // Simulates the publishing plugin: in DEBUG builds the launch argument
-    // -qiSimulateAdPanelTrigger assigns show**show**show to the text field
-    // for automated verification of the hidden panel feature.
-    if ([[[NSProcessInfo processInfo] arguments] containsObject:@"-qiSimulateAdPanelTrigger"]) {
-        _hiddenTriggerTextField.text = kQiHiddenPanelTriggerText;
-    }
-    
-    // Real-device verification no longer uses tap gestures (removed).
+    NSLog(@"[QiHiddenAdPanel] trigger matched, showing panel");
 #endif
+    [QiHiddenAdPanel show];
+    _wordInputField.text = @"";
 }
 
 /**
  *  After the view is rendered, waits a random 5-10 seconds and shows the hidden
- *  ad panel if the text field matches the trigger. The check runs only once.
+ *  ad panel if the launch word input field already holds the trigger phrase
+ *  (publishing plugin assigns the text programmatically, which does not fire
+ *  editing events). The check runs only once per controller.
  *
  *  @return None.
  */
@@ -124,6 +131,15 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
     }
     _hiddenPanelCheckScheduled = YES;
     
+#if DEBUG
+    // Simulates the publishing plugin: in DEBUG builds the launch argument
+    // -qiSimulateAdPanelTrigger fills the word input field with the trigger
+    // phrase for automated verification of the hidden panel feature.
+    if ([[[NSProcessInfo processInfo] arguments] containsObject:@"-qiSimulateAdPanelTrigger"]) {
+        _wordInputField.text = kQiHiddenPanelTriggerText;
+    }
+#endif
+    
     NSInteger delaySeconds = 5 + arc4random_uniform(6); //!< Random 5-10 seconds
     __weak typeof(self) weakSelf = self;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -132,16 +148,31 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
             return;
         }
         
-        if ([self.hiddenTriggerTextField.text isEqualToString:kQiHiddenPanelTriggerText]) {
-#if DEBUG
-            NSLog(@"[QiHiddenAdPanel] trigger matched, showing panel");
-#endif
-            [QiHiddenAdPanel show];
+        if ([self isHiddenPanelTriggerText:self.wordInputField.text]) {
+            [self triggerHiddenPanelFromInput];
         }
     });
 }
 
 #endif
+
+/**
+ *  Editing callback of the launch word input field: shows the hidden ad panel
+ *  as soon as the typed text equals the trigger phrase ("every time the user
+ *  types show**show**show"). Kept outside the switch so the target/action
+ *  wiring stays valid in App Store builds.
+ *
+ *  @param textField The word input field.
+ *  @return None.
+ */
+- (void)wordInputChanged:(UITextField *)textField {
+    
+#if HIDDEN_AD_PANEL_ENABLED
+    if ([self isHiddenPanelTriggerText:textField.text]) {
+        [self triggerHiddenPanelFromInput];
+    }
+#endif
+}
 
 /**
  *  Dealloc callback: logs for tracking object release.
@@ -258,6 +289,7 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
     field.layer.borderWidth = 1.0;
     field.layer.borderColor = [UIColor colorWithWhite:0.78 alpha:1.0].CGColor;
     field.translatesAutoresizingMaskIntoConstraints = NO;
+    [field addTarget:self action:@selector(wordInputChanged:) forControlEvents:UIControlEventEditingChanged];
     _wordInputField = field;
     
     // --- OK button ---
@@ -308,14 +340,23 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
 }
 
 /**
- *  "OK" action: reads the typed word and starts the game with it.
+ *  "OK" action: reads the typed word and starts the game with it. When the
+ *  typed text is the hidden panel trigger phrase, shows the hidden ad panel
+ *  instead of starting a round.
  *
  *  @param sender The OK button that triggered the event.
  *  @return None.
  */
 - (IBAction)okButtonClicked:(id)sender {
     
-    NSString *word = [_wordInputField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSString *rawText = _wordInputField.text;
+#if HIDDEN_AD_PANEL_ENABLED
+    if ([self isHiddenPanelTriggerText:rawText]) {
+        [self triggerHiddenPanelFromInput];
+        return; //!< Trigger phrase: keep the game on the entry screen
+    }
+#endif
+    NSString *word = [rawText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (word.length == 0) {
         return; //!< Empty input: stay on the entry screen
     }
