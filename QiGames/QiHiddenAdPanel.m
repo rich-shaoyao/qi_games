@@ -13,12 +13,15 @@
 //     reloads and updates the button state;
 //  5. Once the panel is shown, the app does not show toasts / alerts.
 //
-//  Style: implemented per the "panel sample image" from the spec (calibrated
-//  after obtaining the sample on 2026-08-26) -- two-column layout: left column
-//  (blue) Rewarded Video + right column (red) Interstitial. Each column has a
-//  title on top and platform row buttons inside (AdMob + Vungle + InMobi rows).
-//  A ✕ close button sits at the top-right; below the bottom gray separator line
-//  there is a small-text placeholder (TBD).
+//  Style: full-width landscape panel (edge-to-edge with a small margin on each
+//  side) -- white rounded container; one header row with the ✕ close button at
+//  the top-right and two column titles "Rewarded Video" / "Interstitial"; below,
+//  one row per ad platform (AdMob / Meta / Vungle / Chartboost / InMobi /
+//  Unity Ads): a platform name label on the left, then the platform's Rewarded
+//  and Interstitial ad windows side by side -- light blue (rgb 163,214,252)
+//  for Rewarded, light orange (rgb 255,217,171) for Interstitial, both in the
+//  same row. The loaded / tappable state uses a solid blue background
+//  (rgb 0,152,251) with white text; idle rows show their status in the window.
 //
 
 #import "QiHiddenAdPanel.h"
@@ -37,17 +40,46 @@ static NSString * const kQiPlatformNameChartboost = @"Chartboost";
 static NSString * const kQiPlatformNameInMobi     = @"InMobi";
 static NSString * const kQiPlatformNameUnityAds   = @"Unity Ads";
 
+// Panel style colors (per the attached sample image): white rounded container,
+// black titles, light-blue Rewarded window / light-orange Interstitial window,
+// solid blue for the loaded/highlighted state.
+static UIColor *QiPanelWhiteColor(void) {
+    return [UIColor colorWithRed:1.00 green:1.00 blue:1.00 alpha:1.00];
+}
+static UIColor *QiPanelTitleColor(void) {
+    return [UIColor blackColor];
+}
+static UIColor *QiPanelRewardedColumnColor(void) {
+    return [UIColor colorWithRed:163.0/255.0 green:214.0/255.0 blue:252.0/255.0 alpha:1.0];
+}
+static UIColor *QiPanelInterstitialColumnColor(void) {
+    return [UIColor colorWithRed:255.0/255.0 green:217.0/255.0 blue:171.0/255.0 alpha:1.0];
+}
+static UIColor *QiPanelHighlightColor(void) {
+    return [UIColor colorWithRed:0.0/255.0 green:152.0/255.0 blue:251.0/255.0 alpha:1.0];
+}
+
+/**
+ *  Returns the resting (idle / loading / not-connected) window color of the
+ *  given ad type: light blue for Rewarded Video, light orange for Interstitial
+ *  (per the sample image).
+ *
+ *  @param type Ad type (QiAdTypeRewarded / QiAdTypeInterstitial).
+ *  @return The window background color.
+ */
+static UIColor *QiPanelColumnColorForType(QiAdType type) {
+    return (type == QiAdTypeRewarded) ? QiPanelRewardedColumnColor() : QiPanelInterstitialColumnColor();
+}
+
 @interface QiHiddenAdPanel ()
 
 @property (nonatomic, strong) UIView *overlayView;             //!< Full-screen overlay
 @property (nonatomic, strong) UIView *containerView;           //!< Panel container
 @property (nonatomic, strong) UIButton *closeButton;           //!< Close button (✕ top-right)
-@property (nonatomic, strong) UILabel *rewardedTitleLabel;     //!< Left column title (Rewarded Video)
-@property (nonatomic, strong) UILabel *interstitialTitleLabel; //!< Right column title (Interstitial)
-@property (nonatomic, strong) NSMutableDictionary<NSNumber *, UIButton *> *rewardedButtons;     //!< Left column platform row buttons, keyed by QiAdPlatform
-@property (nonatomic, strong) NSMutableDictionary<NSNumber *, UIButton *> *interstitialButtons; //!< Right column platform row buttons, keyed by QiAdPlatform
-@property (nonatomic, strong) UIView *separatorView;           //!< Bottom gray separator line
-@property (nonatomic, strong) UILabel *bottomLabel;            //!< Bottom small-text placeholder (TBD)
+@property (nonatomic, strong) UILabel *rewardedTitleLabel;     //!< Rewarded Video column title
+@property (nonatomic, strong) UILabel *interstitialTitleLabel; //!< Interstitial column title
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, UIButton *> *rewardedButtons;     //!< Rewarded ad window buttons, keyed by QiAdPlatform
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, UIButton *> *interstitialButtons; //!< Interstitial ad window buttons, keyed by QiAdPlatform
 
 // Per (type, platform) countdown refresh state, keyed by keyForType:platform:.
 @property (nonatomic, strong) NSMutableDictionary<NSNumber *, NSTimer *> *countDownTimers; //!< Countdown timers per ad slot
@@ -151,17 +183,16 @@ static BOOL QiPlatformConnected(QiAdPlatform platform) {
     [_overlayView addSubview:_containerView];
     
     // First open: auto-load ads for connected platforms (AdMob rewarded +
-    // interstitial); placeholder platforms show as "not configured" (grayed).
+    // interstitial); placeholder platforms show as "not connected" (grayed).
     for (NSNumber *platformNumber in QiPanelPlatforms()) {
         QiAdPlatform platform = [platformNumber integerValue];
-        NSString *platformName = [self platformName:platform];
         if (!QiPlatformConnected(platform)) {
-            [self setButtonForType:QiAdTypeRewarded platform:platform enabled:NO title:[NSString stringWithFormat:@"%@\n未接入", platformName]];
-            [self setButtonForType:QiAdTypeInterstitial platform:platform enabled:NO title:[NSString stringWithFormat:@"%@\n未接入", platformName]];
+            [self setButtonForType:QiAdTypeRewarded platform:platform enabled:NO title:[self slotTitleForType:QiAdTypeRewarded state:@"未接入"]];
+            [self setButtonForType:QiAdTypeInterstitial platform:platform enabled:NO title:[self slotTitleForType:QiAdTypeInterstitial state:@"未接入"]];
             continue;
         }
-        [self setButtonForType:QiAdTypeRewarded platform:platform enabled:NO title:[NSString stringWithFormat:@"%@\nLoading...", platformName]];
-        [self setButtonForType:QiAdTypeInterstitial platform:platform enabled:NO title:[NSString stringWithFormat:@"%@\nLoading...", platformName]];
+        [self setButtonForType:QiAdTypeRewarded platform:platform enabled:NO title:[self slotTitleForType:QiAdTypeRewarded state:@"加载中…"]];
+        [self setButtonForType:QiAdTypeInterstitial platform:platform enabled:NO title:[self slotTitleForType:QiAdTypeInterstitial state:@"加载中…"]];
         [self loadAdForType:QiAdTypeRewarded platform:platform];
         [self loadAdForType:QiAdTypeInterstitial platform:platform];
     }
@@ -183,131 +214,133 @@ static BOOL QiPlatformConnected(QiAdPlatform platform) {
 #pragma mark - Build UI
 
 /**
- *  Builds the panel UI (per the sample image): two columns (left blue Rewarded
- *  Video / right red Interstitial), each with a column title on top and
- *  platform row buttons (AdMob + Vungle + InMobi) inside; ✕ close at the
- *  top-right; bottom gray separator line plus a small-text placeholder.
+ *  Builds the panel UI: a full-width container that stretches across the window
+ *  (with a small margin on each side) -- one header row with the ✕ close button
+ *  at the top-right and the two column titles (Rewarded Video / Interstitial);
+ *  then one row per ad platform (AdMob / Meta / Vungle / Chartboost / InMobi /
+ *  Unity Ads): a platform name label on the left and the platform's two ad
+ *  windows (Rewarded | Interstitial) side by side inside the same row.
  *
  *  @return None.
  */
 - (void)buildContainer {
     
-    CGFloat panelWidth = MIN(320.0, CGRectGetWidth(_overlayView.bounds) - 32.0);
-    CGFloat panelHeight = 400.0;
+    _rewardedButtons = [NSMutableDictionary dictionary];
+    _interstitialButtons = [NSMutableDictionary dictionary];
+    
+    // Full-width panel: only a small margin is left on each side.
+    CGFloat edgeMargin = 10.0;
+    CGFloat panelWidth = CGRectGetWidth(_overlayView.bounds) - edgeMargin * 2.0;
+    
+    // Horizontal layout (left to right):
+    //   pad(12) | platform name column(84) | gap(8) | Rewarded window | gap(8) | Interstitial window | pad(12)
+    CGFloat padX = 12.0;
+    CGFloat nameColumnWidth = 84.0;
+    CGFloat columnGap = 8.0;
+    CGFloat slotsAreaWidth = panelWidth - padX * 2.0 - nameColumnWidth - columnGap;
+    CGFloat slotWidth = (slotsAreaWidth - columnGap) / 2.0;
+    CGFloat slotX = padX + nameColumnWidth + columnGap;
+    
+    // Vertical layout: header row, then 6 platform rows.
+    CGFloat headerHeight = 34.0; //!< Close button + column titles
+    CGFloat rowHeight = 38.0;
+    CGFloat rowGap = 6.0;
+    CGFloat rowsHeight = 6.0 * rowHeight + 5.0 * rowGap;
+    CGFloat panelHeight = headerHeight + rowsHeight + 12.0; //!< 12pt bottom padding
+    CGFloat rowTop = headerHeight;
+    
     _containerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, panelWidth, panelHeight)];
     _containerView.center = CGPointMake(CGRectGetMidX(_overlayView.bounds), CGRectGetMidY(_overlayView.bounds));
-    _containerView.backgroundColor = [UIColor colorWithWhite:0.16 alpha:0.98];
+    _containerView.backgroundColor = QiPanelWhiteColor();
     _containerView.layer.cornerRadius = 12.0;
     _containerView.layer.masksToBounds = YES;
     _containerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
     
-    _rewardedButtons = [NSMutableDictionary dictionary];
-    _interstitialButtons = [NSMutableDictionary dictionary];
-    
-    CGFloat columnGap = 12.0;
-    CGFloat columnWidth = (panelWidth - 32.0 - columnGap) / 2.0; //!< Column width (including 16pt side margins)
-    CGFloat columnHeight = 346.0; //!< Fits 6 platform rows (AdMob / Meta / Vungle / Chartboost / InMobi / Unity Ads)
-    CGFloat columnTop = 12.0;
-    
     // Close button (✕ top-right)
     _closeButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    _closeButton.frame = CGRectMake(panelWidth - 42.0, 6.0, 32.0, 32.0);
+    _closeButton.frame = CGRectMake(panelWidth - 40.0, 6.0, 32.0, 32.0);
     [_closeButton setTitle:@"✕" forState:UIControlStateNormal];
     _closeButton.titleLabel.font = [UIFont systemFontOfSize:18.0];
-    _closeButton.tintColor = [UIColor lightGrayColor];
+    _closeButton.tintColor = [UIColor colorWithWhite:0.4 alpha:1.0];
     [_closeButton addTarget:self action:@selector(closeButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
     [_containerView addSubview:_closeButton];
     
-    // Left column: Rewarded Video (blue)
-    UIView *rewardedColumn = [self makeColumnWithFrame:CGRectMake(16.0, columnTop, columnWidth, columnHeight)
-                                                 color:[UIColor colorWithRed:0.20 green:0.44 blue:0.85 alpha:1.0]];
-    [_containerView addSubview:rewardedColumn];
+    // Column titles (Rewarded Video / Interstitial), aligned above their windows
+    _rewardedTitleLabel = [self makeColumnTitleLabelWithFrame:CGRectMake(slotX, 7.0, slotWidth, 20.0)
+                                                         text:@"Rewarded Video"];
+    [_containerView addSubview:_rewardedTitleLabel];
+    _interstitialTitleLabel = [self makeColumnTitleLabelWithFrame:CGRectMake(slotX + slotWidth + columnGap, 7.0, slotWidth, 20.0)
+                                                             text:@"Interstitial"];
+    [_containerView addSubview:_interstitialTitleLabel];
     
-    _rewardedTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(6.0, 8.0, columnWidth - 12.0, 20.0)];
-    _rewardedTitleLabel.text = @"Rewarded Video";
-    _rewardedTitleLabel.textColor = [UIColor whiteColor];
-    _rewardedTitleLabel.font = [UIFont boldSystemFontOfSize:14.0];
-    _rewardedTitleLabel.textAlignment = NSTextAlignmentCenter;
-    [rewardedColumn addSubview:_rewardedTitleLabel];
-    
-    // Right column: Interstitial (red)
-    UIView *interstitialColumn = [self makeColumnWithFrame:CGRectMake(16.0 + columnWidth + columnGap, columnTop, columnWidth, columnHeight)
-                                                    color:[UIColor colorWithRed:0.85 green:0.30 blue:0.28 alpha:1.0]];
-    [_containerView addSubview:interstitialColumn];
-    
-    _interstitialTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(6.0, 8.0, columnWidth - 12.0, 20.0)];
-    _interstitialTitleLabel.text = @"Interstitial";
-    _interstitialTitleLabel.textColor = [UIColor whiteColor];
-    _interstitialTitleLabel.font = [UIFont boldSystemFontOfSize:14.0];
-    _interstitialTitleLabel.textAlignment = NSTextAlignmentCenter;
-    [interstitialColumn addSubview:_interstitialTitleLabel];
-    
-    // Platform row buttons inside each column (AdMob, then Vungle, then InMobi)
-    CGFloat rowX = 12.0;
-    CGFloat rowWidth = columnWidth - 24.0;
-    CGFloat rowHeight = 44.0;
-    CGFloat rowGap = 8.0;
-    CGFloat rowTop = 34.0;
+    // One row per platform: name label + Rewarded window + Interstitial window
     NSArray<NSNumber *> *platforms = QiPanelPlatforms();
     for (NSUInteger i = 0; i < platforms.count; i++) {
         QiAdPlatform platform = [platforms[i] integerValue];
-        NSInteger tag = [self keyForType:QiAdTypeRewarded platform:platform].integerValue;
+        CGFloat rowY = rowTop + i * (rowHeight + rowGap);
+        BOOL connected = QiPlatformConnected(platform);
         
-        UIButton *rewardedButton = [self makePlatformRowButtonWithFrame:CGRectMake(rowX, rowTop + i * (rowHeight + rowGap), rowWidth, rowHeight) tag:tag];
-        [rewardedColumn addSubview:rewardedButton];
+        // Platform name label (left cell of the row)
+        UILabel *nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(padX, rowY, nameColumnWidth, rowHeight)];
+        nameLabel.text = [self platformName:platform];
+        nameLabel.font = [UIFont boldSystemFontOfSize:12.0];
+        nameLabel.textColor = connected ? QiPanelTitleColor() : [UIColor colorWithWhite:0.55 alpha:1.0];
+        nameLabel.textAlignment = NSTextAlignmentCenter;
+        nameLabel.numberOfLines = 1;
+        nameLabel.adjustsFontSizeToFitWidth = YES;
+        nameLabel.minimumScaleFactor = 0.8;
+        [_containerView addSubview:nameLabel];
+        
+        // Rewarded window
+        NSInteger rewardedTag = [self keyForType:QiAdTypeRewarded platform:platform].integerValue;
+        UIButton *rewardedButton = [self makeSlotButtonWithFrame:CGRectMake(slotX, rowY, slotWidth, rowHeight)
+                                                             tag:rewardedTag];
+        [_containerView addSubview:rewardedButton];
         _rewardedButtons[@(platform)] = rewardedButton;
         
-        UIButton *interstitialButton = [self makePlatformRowButtonWithFrame:CGRectMake(rowX, rowTop + i * (rowHeight + rowGap), rowWidth, rowHeight) tag:tag];
-        [interstitialColumn addSubview:interstitialButton];
+        // Interstitial window
+        NSInteger interstitialTag = [self keyForType:QiAdTypeInterstitial platform:platform].integerValue;
+        UIButton *interstitialButton = [self makeSlotButtonWithFrame:CGRectMake(slotX + slotWidth + columnGap, rowY, slotWidth, rowHeight)
+                                                                 tag:interstitialTag];
+        [_containerView addSubview:interstitialButton];
         _interstitialButtons[@(platform)] = interstitialButton;
     }
-    
-    // Bottom gray separator line + small-text placeholder (TBD)
-    _separatorView = [[UIView alloc] initWithFrame:CGRectMake(16.0, columnTop + columnHeight + 10.0, panelWidth - 32.0, 1.0)];
-    _separatorView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.18];
-    [_containerView addSubview:_separatorView];
-    
-    _bottomLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0, columnTop + columnHeight + 16.0, panelWidth - 32.0, 20.0)];
-    _bottomLabel.text = @""; //!< Placeholder: small text at the bottom, content TBD
-    _bottomLabel.textColor = [UIColor colorWithWhite:0.7 alpha:1.0];
-    _bottomLabel.font = [UIFont systemFontOfSize:11.0];
-    _bottomLabel.textAlignment = NSTextAlignmentCenter;
-    [_containerView addSubview:_bottomLabel];
 }
 
 /**
- *  Creates an ad column container (rounded color block).
+ *  Creates a column title label (Rewarded Video / Interstitial).
  *
- *  @param frame The column frame.
- *  @param color The column background color (blue left / red right).
- *  @return The column view.
+ *  @param frame The label frame.
+ *  @param text  The title text.
+ *  @return The configured label.
  */
-- (UIView *)makeColumnWithFrame:(CGRect)frame color:(UIColor *)color {
+- (UILabel *)makeColumnTitleLabelWithFrame:(CGRect)frame text:(NSString *)text {
     
-    UIView *column = [[UIView alloc] initWithFrame:frame];
-    column.backgroundColor = color;
-    column.layer.cornerRadius = 10.0;
-    column.layer.masksToBounds = YES;
-    column.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
-    return column;
+    UILabel *label = [[UILabel alloc] initWithFrame:frame];
+    label.text = text;
+    label.font = [UIFont boldSystemFontOfSize:14.0];
+    label.textColor = QiPanelTitleColor();
+    label.textAlignment = NSTextAlignmentCenter;
+    return label;
 }
 
 /**
- *  Creates a platform row button. The tag encodes the (type, platform) key so
- *  the tap handler can resolve both from the sender alone.
+ *  Creates an ad window (slot) button for a platform row. The tag encodes the
+ *  (type, platform) key so the tap handler can resolve both from the sender
+ *  alone.
  *
  *  @param frame The button frame.
  *  @param tag   The (type, platform) key (see keyForType:platform:).
  *  @return The configured button.
  */
-- (UIButton *)makePlatformRowButtonWithFrame:(CGRect)frame tag:(NSInteger)tag {
+- (UIButton *)makeSlotButtonWithFrame:(CGRect)frame tag:(NSInteger)tag {
     
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     button.frame = frame;
     button.tag = tag;
     button.titleLabel.numberOfLines = 2;
     button.titleLabel.textAlignment = NSTextAlignmentCenter;
-    button.titleLabel.font = [UIFont boldSystemFontOfSize:13.0];
+    button.titleLabel.font = [UIFont boldSystemFontOfSize:12.0];
     button.layer.cornerRadius = 8.0;
     button.layer.masksToBounds = YES;
     [button addTarget:self action:@selector(platformButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
@@ -345,6 +378,21 @@ static BOOL QiPlatformConnected(QiAdPlatform platform) {
 }
 
 /**
+ *  Builds the two-line title for an ad window: the Chinese ad-type name on the
+ *  first line and the current state on the second. The platform name is not
+ *  repeated here -- it is shown by the platform name label of the row.
+ *
+ *  @param type  Ad type (QiAdTypeRewarded / QiAdTypeInterstitial).
+ *  @param state The state text (loading / loaded / not connected / countdown...).
+ *  @return The two-line window title.
+ */
+- (NSString *)slotTitleForType:(QiAdType)type state:(NSString *)state {
+    
+    NSString *typeName = (type == QiAdTypeRewarded) ? @"激励视频" : @"插屏广告";
+    return [NSString stringWithFormat:@"%@\n%@", typeName, state];
+}
+
+/**
  *  Returns the platform row button of the given ad slot.
  *
  *  @param type     Ad type (QiAdTypeRewarded / QiAdTypeInterstitial).
@@ -360,13 +408,14 @@ static BOOL QiPlatformConnected(QiAdPlatform platform) {
 #pragma mark - Button state
 
 /**
- *  Sets the platform row button state and title: when enabled it highlights
- *  (semi-transparent white background, white text); when disabled it grays out
- *  (semi-transparent black background, gray text, not tappable).
+ *  Sets an ad window button state and title: enabled highlights it with the
+ *  solid blue background and white text (tappable); disabled keeps the resting
+ *  light column color (light blue for Rewarded / light orange for Interstitial)
+ *  with white text and is not tappable.
  *
  *  @param type     Ad type (QiAdTypeRewarded / QiAdTypeInterstitial).
  *  @param platform Ad network platform.
- *  @param enabled  YES means tappable (highlighted); NO means not tappable (gray).
+ *  @param enabled  YES means tappable (highlighted); NO means not tappable (idle).
  *  @param title    The button title to display.
  *  @return None.
  */
@@ -378,13 +427,13 @@ static BOOL QiPlatformConnected(QiAdPlatform platform) {
     [button setTitle:title forState:UIControlStateNormal];
     
     if (enabled) {
-        // Highlighted: tappable
-        button.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.28];
+        // Highlighted / tappable: solid blue background, white text (per the sample image)
+        button.backgroundColor = QiPanelHighlightColor();
         [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     } else {
-        // Grayed out: not tappable
-        button.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.18];
-        [button setTitleColor:[UIColor colorWithWhite:0.8 alpha:1.0] forState:UIControlStateNormal];
+        // Idle / not tappable: resting light column color, white text
+        button.backgroundColor = QiPanelColumnColorForType(type);
+        [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     }
 }
 
@@ -425,9 +474,8 @@ static BOOL QiPlatformConnected(QiAdPlatform platform) {
     NSNumber *key = [self keyForType:type platform:platform];
     if ([_busyKeys containsObject:key]) { return; } //!< During countdown refresh, state is handled by the countdown callback
     
-    NSString *platformName = [self platformName:platform];
-    NSString *title = loaded ? [NSString stringWithFormat:@"%@\nTap to Play", platformName]
-                             : [NSString stringWithFormat:@"%@\nNo Ad", platformName];
+    NSString *title = loaded ? [self slotTitleForType:type state:@"点击播放"]
+                             : [self slotTitleForType:type state:@"暂无广告"];
     [self setButtonForType:type platform:platform enabled:loaded title:title];
     
 #if DEBUG
@@ -477,8 +525,7 @@ static BOOL QiPlatformConnected(QiAdPlatform platform) {
     
     if (!QiPlatformConnected(platform)) { return; }
     NSNumber *key = [self keyForType:type platform:platform];
-    NSString *platformName = [self platformName:platform];
-    [self setButtonForType:type platform:platform enabled:NO title:[NSString stringWithFormat:@"%@\nPlaying...", platformName]];
+    [self setButtonForType:type platform:platform enabled:NO title:[self slotTitleForType:type state:@"播放中…"]];
     
     __weak typeof(self) weakSelf = self;
     [[QiAdManager sharedManager] showAdOfType:type completion:^(BOOL success) {
@@ -545,16 +592,14 @@ static BOOL QiPlatformConnected(QiAdPlatform platform) {
  */
 - (void)updateCountDownButtonForKey:(NSNumber *)key {
     
-    // During the countdown the button stays gray (not tappable); only the
+    // During the countdown the button stays idle (not tappable); only the
     // remaining-seconds hint is updated. Note: no toast / alert is shown once
     // the panel is up; all countdown feedback is contained in the button title.
     NSInteger keyValue = key.integerValue;
     QiAdType type = (QiAdType)(keyValue / 10);
-    QiAdPlatform platform = (QiAdPlatform)(keyValue % 10);
-    NSString *platformName = [self platformName:platform];
     NSInteger remaining = [_remainingSeconds[key] integerValue];
-    [self setButtonForType:type platform:platform enabled:NO
-                     title:[NSString stringWithFormat:@"%@\nRefreshing %lds", platformName, (long)remaining]];
+    [self setButtonForType:type platform:(QiAdPlatform)(keyValue % 10) enabled:NO
+                     title:[self slotTitleForType:type state:[NSString stringWithFormat:@"%ld 秒后恢复", (long)remaining]]];
 }
 
 /**
