@@ -415,7 +415,7 @@
 				SWIFT_VERSION = 5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.yianzhixin.ios.word;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1";
 				VALID_ARCHS = "arm64 x86_64";
 			};
 			name = Debug;
@@ -439,7 +439,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.yianzhixin.ios.word;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "$(SIGNING_PROFILE_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1";
 				VALID_ARCHS = "arm64 x86_64";
 			};
 			name = Release;
