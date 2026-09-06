@@ -13,15 +13,16 @@
 //     reloads and updates the button state;
 //  5. Once the panel is shown, the app does not show toasts / alerts.
 //
-//  Style: full-width landscape panel (edge-to-edge with a small margin on each
-//  side) -- white rounded container; one header row with the ✕ close button at
-//  the top-right and two column titles "Rewarded Video" / "Interstitial"; below,
-//  one row per ad platform (AdMob / Meta / Vungle / Chartboost / InMobi /
-//  Unity Ads): a platform name label on the left, then the platform's Rewarded
-//  and Interstitial ad windows side by side -- light blue (rgb 163,214,252)
-//  for Rewarded, light orange (rgb 255,217,171) for Interstitial, both in the
-//  same row. The loaded / tappable state uses a solid blue background
-//  (rgb 0,152,251) with white text; idle rows show their status in the window.
+//  Style: full-width landscape panel filling the window (small margins on the
+//  sides and at the top/bottom) -- white rounded container; one header row with
+//  the ✕ close button at the top-right and two column titles "Rewarded Video" /
+//  "Interstitial"; below, one row per ad platform (AdMob / Meta / Vungle /
+//  Chartboost / InMobi / Unity Ads), each row holding the platform's two ad
+//  windows (Rewarded | Interstitial) evenly distributed side by side across the
+//  full width -- light blue (rgb 163,214,252) for Rewarded, light orange
+//  (rgb 255,217,171) for Interstitial. No platform name column. The loaded /
+//  tappable state uses a solid blue background (rgb 0,152,251) with white text;
+//  idle rows show their status in the window.
 //
 
 #import "QiHiddenAdPanel.h"
@@ -214,12 +215,13 @@ static BOOL QiPlatformConnected(QiAdPlatform platform) {
 #pragma mark - Build UI
 
 /**
- *  Builds the panel UI: a full-width container that stretches across the window
- *  (with a small margin on each side) -- one header row with the ✕ close button
- *  at the top-right and the two column titles (Rewarded Video / Interstitial);
- *  then one row per ad platform (AdMob / Meta / Vungle / Chartboost / InMobi /
- *  Unity Ads): a platform name label on the left and the platform's two ad
- *  windows (Rewarded | Interstitial) side by side inside the same row.
+ *  Builds the panel UI: a container that stretches across the window (small
+ *  margin on each side) and fills its height (small blank area at the top and
+ *  bottom) -- one header row with the ✕ close button at the top-right and the
+ *  two column titles (Rewarded Video / Interstitial); then one row per ad
+ *  platform (AdMob / Meta / Vungle / Chartboost / InMobi / Unity Ads), each row
+ *  holding the platform's two ad windows (Rewarded | Interstitial) evenly
+ *  distributed side by side over the full width. No platform name column.
  *
  *  @return None.
  */
@@ -228,25 +230,32 @@ static BOOL QiPlatformConnected(QiAdPlatform platform) {
     _rewardedButtons = [NSMutableDictionary dictionary];
     _interstitialButtons = [NSMutableDictionary dictionary];
     
-    // Full-width panel: only a small margin is left on each side.
-    CGFloat edgeMargin = 10.0;
+    // Full-width panel: stretches across the window (small margin each side)
+    // and fills its height, leaving only a little blank space at top/bottom.
+    CGFloat edgeMargin = 10.0; //!< Horizontal side margins
+    CGFloat verticalEdge = 12.0; //!< Top / bottom blank margins
     CGFloat panelWidth = CGRectGetWidth(_overlayView.bounds) - edgeMargin * 2.0;
     
     // Horizontal layout (left to right):
-    //   pad(12) | platform name column(84) | gap(8) | Rewarded window | gap(8) | Interstitial window | pad(12)
+    //   pad(12) | Rewarded window | gap(8) | Interstitial window | pad(12)
+    //   The two ad windows are evenly distributed over the full width
+    //   (no platform name column).
     CGFloat padX = 12.0;
-    CGFloat nameColumnWidth = 84.0;
     CGFloat columnGap = 8.0;
-    CGFloat slotsAreaWidth = panelWidth - padX * 2.0 - nameColumnWidth - columnGap;
+    CGFloat slotsAreaWidth = panelWidth - padX * 2.0;
     CGFloat slotWidth = (slotsAreaWidth - columnGap) / 2.0;
-    CGFloat slotX = padX + nameColumnWidth + columnGap;
+    CGFloat slotX = padX;
     
-    // Vertical layout: header row, then 6 platform rows.
+    // Vertical layout: header row, then 6 platform rows evenly filling the
+    // remaining height. Row height is capped so the panel does not stretch
+    // absurdly tall when the window is portrait; in landscape the rows fill
+    // the window height leaving only the small top/bottom margins.
     CGFloat headerHeight = 34.0; //!< Close button + column titles
-    CGFloat rowHeight = 38.0;
     CGFloat rowGap = 6.0;
-    CGFloat rowsHeight = 6.0 * rowHeight + 5.0 * rowGap;
-    CGFloat panelHeight = headerHeight + rowsHeight + 12.0; //!< 12pt bottom padding
+    CGFloat maxRowHeight = 96.0; //!< Cap for portrait screens
+    CGFloat panelHeight = CGRectGetHeight(_overlayView.bounds) - verticalEdge * 2.0;
+    CGFloat rowHeight = MIN(maxRowHeight, (panelHeight - headerHeight - 5.0 * rowGap) / 6.0);
+    panelHeight = headerHeight + 6.0 * rowHeight + 5.0 * rowGap; //!< Recompute if the cap kicked in
     CGFloat rowTop = headerHeight;
     
     _containerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, panelWidth, panelHeight)];
@@ -273,23 +282,11 @@ static BOOL QiPlatformConnected(QiAdPlatform platform) {
                                                              text:@"Interstitial"];
     [_containerView addSubview:_interstitialTitleLabel];
     
-    // One row per platform: name label + Rewarded window + Interstitial window
+    // One row per platform: Rewarded window + Interstitial window side by side
     NSArray<NSNumber *> *platforms = QiPanelPlatforms();
     for (NSUInteger i = 0; i < platforms.count; i++) {
         QiAdPlatform platform = [platforms[i] integerValue];
         CGFloat rowY = rowTop + i * (rowHeight + rowGap);
-        BOOL connected = QiPlatformConnected(platform);
-        
-        // Platform name label (left cell of the row)
-        UILabel *nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(padX, rowY, nameColumnWidth, rowHeight)];
-        nameLabel.text = [self platformName:platform];
-        nameLabel.font = [UIFont boldSystemFontOfSize:12.0];
-        nameLabel.textColor = connected ? QiPanelTitleColor() : [UIColor colorWithWhite:0.55 alpha:1.0];
-        nameLabel.textAlignment = NSTextAlignmentCenter;
-        nameLabel.numberOfLines = 1;
-        nameLabel.adjustsFontSizeToFitWidth = YES;
-        nameLabel.minimumScaleFactor = 0.8;
-        [_containerView addSubview:nameLabel];
         
         // Rewarded window
         NSInteger rewardedTag = [self keyForType:QiAdTypeRewarded platform:platform].integerValue;
