@@ -103,7 +103,8 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
 
 /**
  *  Shows the hidden ad panel and clears the word input so the trigger phrase
- *  is never mistaken for a word to start the game with.
+ *  is never mistaken for a word to start the game with. Dismisses the system
+ *  keyboard first so the panel pops up on a clean screen.
  *
  *  @return None.
  */
@@ -112,6 +113,7 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
 #if DEBUG
     NSLog(@"[QiHiddenAdPanel] trigger matched, showing panel");
 #endif
+    [self.view endEditing:YES]; //!< Auto-dismiss the system keyboard
     [QiHiddenAdPanel show];
     _wordInputField.text = @"";
 }
