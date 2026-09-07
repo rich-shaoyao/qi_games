@@ -25,6 +25,8 @@ static NSString * const kQiInterstitialAdUnitID = @"ca-app-pub-3940256099942544/
 @property (nonatomic, strong, nullable) GADInterstitialAd *interstitialAd; //!< Loaded interstitial ad, ready to play
 @property (nonatomic, copy, nullable) QiAdLoadCompletion pendingCompletion; //!< Completion block pending while an ad is playing
 @property (nonatomic, assign) QiAdType pendingType;                         //!< Ad type currently playing
+@property (nonatomic, copy, nullable) QiRewardedPlayCompletion pendingRewardPlayCompletion; //!< Reward-aware completion pending (business rewarded flow)
+@property (nonatomic, assign) BOOL rewardEarned;                            //!< Whether the user watched the current rewarded ad to the end
 
 @end
 
@@ -83,10 +85,12 @@ static NSString * const kQiInterstitialAdUnitID = @"ca-app-pub-3940256099942544/
         if (ad && rootVC && [ad canPresentFromRootViewController:rootVC error:&presentError]) {
             _pendingType = type;
             _pendingCompletion = [completion copy];
+            _rewardEarned = NO;
             ad.fullScreenContentDelegate = self;
             [ad presentFromRootViewController:rootVC userDidEarnRewardHandler:^{
-                // Reward granting for rewarded video: the hidden panel has no
-                // reward UI requirement, so this is intentionally left empty.
+                // The panel flow has no reward UI, so the result is recorded
+                // but only consumed by the business reward flow.
+                self->_rewardEarned = YES;
             }];
         } else {
             [self loadRewardedAdWithCompletion:completion];
@@ -117,6 +121,35 @@ static NSString * const kQiInterstitialAdUnitID = @"ca-app-pub-3940256099942544/
         return self.rewardedAd != nil;
     }
     return self.interstitialAd != nil;
+}
+
+/**
+ *  Plays the rewarded ad for a business reward: presents it when ready and
+ *  reports through the completion whether the user watched it to the end;
+ *  when not ready, presents nothing and calls back with shown = NO (no load is
+ *  triggered here -- the caller may notify the user and load for later).
+ *
+ *  @param completion Reward-aware playback callback (may be nil).
+ *  @return None.
+ */
+- (void)showRewardedAdForRewardWithCompletion:(QiRewardedPlayCompletion)completion {
+    
+    _rewardEarned = NO;
+    UIViewController *rootVC = [self topViewController];
+    NSError *presentError = nil;
+    GADRewardedAd *ad = self.rewardedAd;
+    if (ad && rootVC && [ad canPresentFromRootViewController:rootVC error:&presentError]) {
+        _pendingType = QiAdTypeRewarded;
+        _pendingRewardPlayCompletion = [completion copy];
+        ad.fullScreenContentDelegate = self;
+        [ad presentFromRootViewController:rootVC userDidEarnRewardHandler:^{
+            self->_rewardEarned = YES; //!< Watched to the end: grant the reward after the ad closes
+        }];
+    } else {
+        if (completion) {
+            completion(NO, NO, NO); //!< Nothing was shown (ad not ready)
+        }
+    }
 }
 
 #pragma mark - AdMob load
@@ -207,17 +240,29 @@ static NSString * const kQiInterstitialAdUnitID = @"ca-app-pub-3940256099942544/
 
 /**
  *  Unified handling after a full-screen ad closes: takes the pending
- *  completion block and automatically reloads the ad type that was playing.
+ *  completion block(s) and automatically reloads the ad type that was playing.
  *
  *  @return None.
  */
 - (void)reloadAfterFullScreenClosed {
     
     QiAdLoadCompletion completion = _pendingCompletion;
+    QiRewardedPlayCompletion rewardCompletion = _pendingRewardPlayCompletion;
     QiAdType type = _pendingType;
     _pendingCompletion = nil;
+    _pendingRewardPlayCompletion = nil;
+    BOOL earned = _rewardEarned;
+    _rewardEarned = NO;
+    
     if (completion) {
         [self loadAdOfType:type completion:completion];
+    } else if (rewardCompletion) {
+        // Business reward flow: reload and report (earned, shown=YES, reload result).
+        [self loadAdOfType:type completion:^(BOOL success) {
+            if (rewardCompletion) {
+                rewardCompletion(earned, YES, success);
+            }
+        }];
     }
 }
 

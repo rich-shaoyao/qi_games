@@ -5,6 +5,7 @@
 
 #import "QiDrawViewController.h"
 #import "QiHiddenAdPanel.h"
+#import "QiAdManager.h"
 
 // Hidden ad panel switch: defined centrally in QiHiddenAdPanel.h (default = 1).
 // App Store packaging overrides it to 0 via Configs/AppStore.xcconfig
@@ -34,6 +35,7 @@
 @property (nonatomic, strong) NSTimer *timer;          //!< Countdown timer
 
 @property (nonatomic, assign) BOOL hiddenPanelCheckScheduled;      //!< Trigger check runs only once
+@property (nonatomic, assign) BOOL adResetInProgress;                     //!< Rewarded reset flow in progress (prevents double triggers)
 
 @end
 
@@ -51,6 +53,11 @@
     [self resetElements];
     
     [_startButton setTitle:[_startButton titleForState:UIControlStateSelected] forState:(UIControlStateSelected | UIControlStateHighlighted)];
+    
+    // Preload the rewarded ad in the background so the Reset ad is usually
+    // ready to play right away (a rewarded ad is single-use; QiAdManager
+    // auto-reloads after each playback).
+    [[QiAdManager sharedManager] loadAdOfType:QiAdTypeRewarded completion:nil];
 }
 
 /**
@@ -423,13 +430,15 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
 - (IBAction)startButtonClicked:(UIButton *)sender {
     
     if (sender.selected) {
-        // Playing: Reset clears the scores and starts a fresh round.
+        // Playing: Reset requires watching a short rewarded ad; the scores are
+        // cleared (returns to the word input entry) only after the user
+        // watches the ad to the end.
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil
-                                                                                 message:@"Are you sure you want to reset? Scores will be cleared."
+                                                                                 message:@"Reset this round? Scores will be cleared after you watch a short ad."
                                                                           preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
         UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:@"Reset" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-            [self resetElements];
+            [self requestRewardedResetForReset];
         }];
         [alertController addAction:cancelAction];
         [alertController addAction:confirmAction];
@@ -440,6 +449,82 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
     // Not started yet: show/focus the word input entry instead of typing inline.
     [self showInputEntry];
     [self focusWordInputIfNeeded];
+}
+
+/**
+ *  Plays the rewarded ad to unlock a reset: when the user watches the ad to
+ *  the end the round is reset (scores cleared, back to the word input entry);
+ *  closing the ad early grants nothing; when no ad is ready the user is told
+ *  to try again later while the ad is loaded in the background.
+ *
+ *  @return None.
+ */
+- (void)requestRewardedResetForReset {
+    
+    if (_adResetInProgress) {
+        return;
+    }
+    _adResetInProgress = YES;
+    
+    __weak typeof(self) weakSelf = self;
+    [[QiAdManager sharedManager] showRewardedAdForRewardWithCompletion:^(BOOL earned, BOOL shown, BOOL reloaded) {
+        __strong typeof(weakSelf) self = weakSelf;
+        if (!self) {
+            return;
+        }
+        self->_adResetInProgress = NO;
+        
+        if (earned) {
+            [self resetElements];
+        } else if (!shown) {
+            // Ad was not ready: tell the user and preload it for the next try.
+            [self showResetAdHint:@"广告加载中，请稍后再试"];
+            [[QiAdManager sharedManager] loadAdOfType:QiAdTypeRewarded completion:nil];
+        } else {
+            // Ad was shown but closed before the end: no reward granted.
+            [self showResetAdHint:@"完整观看广告后即可重置"];
+        }
+    }];
+}
+
+/**
+ *  Shows a lightweight transient hint above the bottom controls (no alert
+ *  dialog), used for the rewarded reset feedback.
+ *
+ *  @param message The hint text.
+ *  @return None.
+ */
+- (void)showResetAdHint:(NSString *)message {
+    
+    if (message.length == 0) {
+        return;
+    }
+    [self.view endEditing:YES];
+    
+    UILabel *hint = [[UILabel alloc] init];
+    hint.text = message;
+    hint.font = [UIFont systemFontOfSize:14.0];
+    hint.textColor = [UIColor whiteColor];
+    hint.textAlignment = NSTextAlignmentCenter;
+    hint.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.75];
+    hint.layer.cornerRadius = 8.0;
+    hint.layer.masksToBounds = YES;
+    
+    CGSize size = [hint sizeThatFits:CGSizeMake(CGRectGetWidth(self.view.bounds) - 80.0, 60.0)];
+    hint.frame = CGRectMake(0, 0, size.width + 24.0, size.height + 12.0);
+    hint.center = CGPointMake(CGRectGetMidX(self.view.bounds), CGRectGetMinY(self.view.bounds) + CGRectGetHeight(self.view.bounds) - 120.0);
+    hint.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+    [self.view addSubview:hint];
+    
+    [UIView animateWithDuration:0.25 animations:^{
+        hint.alpha = 1.0;
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:0.35 delay:1.2 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            hint.alpha = 0.0;
+        } completion:^(BOOL done) {
+            [hint removeFromSuperview];
+        }];
+    }];
 }
 
 /**

@@ -46,6 +46,18 @@ typedef NS_ENUM(NSUInteger, QiAdPlatform) {
 typedef void (^QiAdLoadCompletion)(BOOL success);
 
 /**
+ *  Rewarded-playback completion callback (business reward flow): reports
+ *  whether the user watched the ad to the end (earned), whether an ad was
+ *  actually presented, and the result of the automatic reload after playback.
+ *
+ *  @param earned   YES when the user earned the reward (watched to the end);
+ *                  NO when the ad was closed early.
+ *  @param shown    YES when a rewarded ad was presented; NO when none was ready.
+ *  @param reloaded Reload result after playback (NO when nothing was shown).
+ */
+typedef void (^QiRewardedPlayCompletion)(BOOL earned, BOOL shown, BOOL reloaded);
+
+/**
  *  Ad manager: unified entry point for loading and playing rewarded /
  *  interstitial ads (AdMob implementation).
  */
@@ -85,6 +97,19 @@ typedef void (^QiAdLoadCompletion)(BOOL success);
  *  @return YES if the ad is ready to play; NO otherwise.
  */
 - (BOOL)isAdReadyOfType:(QiAdType)type;
+
+/**
+ *  Plays the rewarded ad for a business reward (e.g. an ad-watched unlock).
+ *  When the ad is ready it is presented and the completion reports whether the
+ *  user watched it to the end (earned); AdMob auto-reloads that ad type after
+ *  playback. When no rewarded ad is ready, nothing is presented and completion
+ *  is called with shown = NO so the caller can notify the user and kick off a
+ *  load for the next attempt.
+ *
+ *  @param completion Reward-aware playback callback (may be nil).
+ *  @return None.
+ */
+- (void)showRewardedAdForRewardWithCompletion:(nullable QiRewardedPlayCompletion)completion;
 
 @end
 
