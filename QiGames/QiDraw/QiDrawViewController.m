@@ -291,14 +291,15 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
     // --- Word text field (UITextField control) ---
     UITextField *field = [[UITextField alloc] init];
     field.delegate = self;
-    field.placeholder = @"e.g. Watermelon";
-    field.textColor = [UIColor blackColor]; //!< Black typed text, clearly separated from the white background
     field.font = [UIFont systemFontOfSize:28 weight:UIFontWeightMedium];
+    field.textColor = [UIColor blackColor]; //!< Black typed text, clearly separated from the white background
     field.textAlignment = NSTextAlignmentCenter;
     field.autocapitalizationType = UITextAutocapitalizationTypeWords;
     field.clearButtonMode = UITextFieldViewModeWhileEditing;
     field.returnKeyType = UIReturnKeyGo;
     field.backgroundColor = [UIColor whiteColor];
+    field.attributedPlaceholder = [[NSAttributedString alloc] initWithString:@"e.g. Watermelon"
+                                                                  attributes:@{ NSForegroundColorAttributeName: [UIColor colorWithWhite:0.6 alpha:1.0] }]; //!< Light gray hint text
     field.layer.cornerRadius = 10.0;
     field.layer.borderWidth = 1.0;
     field.layer.borderColor = [UIColor colorWithWhite:0.78 alpha:1.0].CGColor;
@@ -402,7 +403,8 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
                                                                              message:@"Type the word the team should guess"
                                                                       preferredStyle:UIAlertControllerStyleAlert];
     [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        textField.placeholder = @"e.g. Watermelon";
+        textField.attributedPlaceholder = [[NSAttributedString alloc] initWithString:@"e.g. Watermelon"
+                                                                          attributes:@{ NSForegroundColorAttributeName: [UIColor colorWithWhite:0.6 alpha:1.0] }]; //!< Light gray hint text
         textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
         textField.clearButtonMode = UITextFieldViewModeWhileEditing;
     }];
