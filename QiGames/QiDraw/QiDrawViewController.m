@@ -288,6 +288,7 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
     UITextField *field = [[UITextField alloc] init];
     field.delegate = self;
     field.placeholder = @"e.g. Watermelon";
+    field.textColor = [UIColor blackColor]; //!< Black typed text, clearly separated from the white background
     field.font = [UIFont systemFontOfSize:28 weight:UIFontWeightMedium];
     field.textAlignment = NSTextAlignmentCenter;
     field.autocapitalizationType = UITextAutocapitalizationTypeWords;
@@ -430,11 +431,11 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
 - (IBAction)startButtonClicked:(UIButton *)sender {
     
     if (sender.selected) {
-        // Playing: Reset requires watching a short rewarded ad; the scores are
-        // cleared (returns to the word input entry) only after the user
-        // watches the ad to the end.
+        // Playing: Reset confirms and then plays a best-effort rewarded ad;
+        // the scores are cleared (back to the word input entry) regardless of
+        // the ad outcome (watched / closed / failed / no ad).
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil
-                                                                                 message:@"Reset this round? Scores will be cleared after you watch a short ad."
+                                                                                 message:@"Reset this round? Scores will be cleared."
                                                                           preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
         UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:@"Reset" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
@@ -452,10 +453,10 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
 }
 
 /**
- *  Plays the rewarded ad to unlock a reset: when the user watches the ad to
- *  the end the round is reset (scores cleared, back to the word input entry);
- *  closing the ad early grants nothing; when no ad is ready the user is told
- *  to try again later while the ad is loaded in the background.
+ *  Plays the rewarded ad as a best-effort monetization attempt before a
+ *  reset. The reset is granted regardless of the ad outcome: watched to the
+ *  end, closed early, presentation failure or no ad available -- the round is
+ *  always reset. When no ad was ready, one is preloaded for the next reset.
  *
  *  @return None.
  */
@@ -474,56 +475,14 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
         }
         self->_adResetInProgress = NO;
         
-        if (earned) {
-            [self resetElements];
-        } else if (!shown) {
-            // Ad was not ready: tell the user and preload it for the next try.
-            [self showResetAdHint:@"广告加载中，请稍后再试"];
+        // Reset always proceeds; the rewarded ad is a best-effort attempt
+        // (watched to the end when the user keeps watching).
+        [self resetElements];
+        
+        if (!shown) {
+            // No ad was ready / could not be presented: preload for the next reset.
             [[QiAdManager sharedManager] loadAdOfType:QiAdTypeRewarded completion:nil];
-        } else {
-            // Ad was shown but closed before the end: no reward granted.
-            [self showResetAdHint:@"完整观看广告后即可重置"];
         }
-    }];
-}
-
-/**
- *  Shows a lightweight transient hint above the bottom controls (no alert
- *  dialog), used for the rewarded reset feedback.
- *
- *  @param message The hint text.
- *  @return None.
- */
-- (void)showResetAdHint:(NSString *)message {
-    
-    if (message.length == 0) {
-        return;
-    }
-    [self.view endEditing:YES];
-    
-    UILabel *hint = [[UILabel alloc] init];
-    hint.text = message;
-    hint.font = [UIFont systemFontOfSize:14.0];
-    hint.textColor = [UIColor whiteColor];
-    hint.textAlignment = NSTextAlignmentCenter;
-    hint.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.75];
-    hint.layer.cornerRadius = 8.0;
-    hint.layer.masksToBounds = YES;
-    
-    CGSize size = [hint sizeThatFits:CGSizeMake(CGRectGetWidth(self.view.bounds) - 80.0, 60.0)];
-    hint.frame = CGRectMake(0, 0, size.width + 24.0, size.height + 12.0);
-    hint.center = CGPointMake(CGRectGetMidX(self.view.bounds), CGRectGetMinY(self.view.bounds) + CGRectGetHeight(self.view.bounds) - 120.0);
-    hint.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
-    [self.view addSubview:hint];
-    
-    [UIView animateWithDuration:0.25 animations:^{
-        hint.alpha = 1.0;
-    } completion:^(BOOL finished) {
-        [UIView animateWithDuration:0.35 delay:1.2 options:UIViewAnimationOptionCurveEaseIn animations:^{
-            hint.alpha = 0.0;
-        } completion:^(BOOL done) {
-            [hint removeFromSuperview];
-        }];
     }];
 }
 
