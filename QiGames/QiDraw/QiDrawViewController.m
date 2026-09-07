@@ -56,8 +56,12 @@
     
     // Preload the rewarded ad in the background so the Reset ad is usually
     // ready to play right away (a rewarded ad is single-use; QiAdManager
-    // auto-reloads after each playback).
+    // auto-reloads after each playback). Channel builds only: like the hidden
+    // ad panel, the rewarded reset ad is disabled in App Store builds
+    // (HIDDEN_AD_PANEL_ENABLED=0 via Configs/AppStore.xcconfig).
+#if HIDDEN_AD_PANEL_ENABLED
     [[QiAdManager sharedManager] loadAdOfType:QiAdTypeRewarded completion:nil];
+#endif
 }
 
 /**
@@ -453,10 +457,13 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
 }
 
 /**
- *  Plays the rewarded ad as a best-effort monetization attempt before a
- *  reset. The reset is granted regardless of the ad outcome: watched to the
- *  end, closed early, presentation failure or no ad available -- the round is
- *  always reset. When no ad was ready, one is preloaded for the next reset.
+ *  Handles a confirmed reset. Channel builds (HIDDEN_AD_PANEL_ENABLED=1) play
+ *  a best-effort rewarded ad before resetting: the reset is granted regardless
+ *  of the ad outcome (watched to the end, closed early, presentation failure
+ *  or no ad available -- the round is always reset) and a missing ad is
+ *  preloaded for the next reset. App Store builds (HIDDEN_AD_PANEL_ENABLED=0)
+ *  reset directly without any ad, consistent with the hidden ad panel trigger
+ *  which is also compiled out there.
  *
  *  @return None.
  */
@@ -467,6 +474,7 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
     }
     _adResetInProgress = YES;
     
+#if HIDDEN_AD_PANEL_ENABLED
     __weak typeof(self) weakSelf = self;
     [[QiAdManager sharedManager] showRewardedAdForRewardWithCompletion:^(BOOL earned, BOOL shown, BOOL reloaded) {
         __strong typeof(weakSelf) self = weakSelf;
@@ -484,6 +492,12 @@ static NSString * const kQiHiddenPanelTriggerText = @"show**show**show";
             [[QiAdManager sharedManager] loadAdOfType:QiAdTypeRewarded completion:nil];
         }
     }];
+#else
+    // App Store build: no rewarded reset ad (compiled out like the hidden
+    // panel); reset directly.
+    _adResetInProgress = NO;
+    [self resetElements];
+#endif
 }
 
 /**
